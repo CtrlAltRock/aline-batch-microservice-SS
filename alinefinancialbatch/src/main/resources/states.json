@@ -1,0 +1,355 @@
+{
+  "states":
+[
+  {
+    "abbreviation": "AL",
+    "state": "Alabama",
+    "capital": "Montgomery",
+    "minZipCode": 35004,
+    "maxZipCode": 36925
+  },
+  {
+    "abbreviation": "AK",
+    "state": "Alaska",
+    "capital": "Juneau",
+    "minZipCode": 99501,
+    "maxZipCode": 99950
+  },
+  {
+    "abbreviation": "AZ",
+    "state": "Arizona",
+    "capital": "Phoenix",
+    "minZipCode": 85001,
+    "maxZipCode": 86556
+  },
+  {
+    "abbreviation": "AR",
+    "state": "Arkansas",
+    "capital": "Little Rock",
+    "minZipCode": 71601,
+    "maxZipCode": 72959
+  },
+  {
+    "abbreviation": "CA",
+    "state": "California",
+    "capital": "Sacramento",
+    "minZipCode": 90001,
+    "maxZipCode": 96162
+  },
+  {
+    "abbreviation": "CO",
+    "state": "Colorado",
+    "capital": "Denver",
+    "minZipCode": 80001,
+    "maxZipCode": 81658
+  },
+  {
+    "abbreviation": "CT",
+    "state": "Connecticut",
+    "capital": "Hartford",
+    "minZipCode": 6001,
+    "maxZipCode": 6928
+  },
+  {
+    "abbreviation": "DE",
+    "state": "Delaware",
+    "capital": "Dover",
+    "minZipCode": 19701,
+    "maxZipCode": 19980
+  },
+  {
+    "abbreviation": "FL",
+    "state": "Florida",
+    "capital": "Tallahassee",
+    "minZipCode": 32003,
+    "maxZipCode": 34997
+  },
+  {
+    "abbreviation": "GA",
+    "state": "Georgia",
+    "capital": "Atlanta",
+    "minZipCode": 30002,
+    "maxZipCode": 39901
+  },
+  {
+    "abbreviation": "HI",
+    "state": "Hawaii",
+    "capital": "Honolulu",
+    "minZipCode": 96701,
+    "maxZipCode": 96898
+  },
+  {
+    "abbreviation": "ID",
+    "state": "Idaho",
+    "capital": "Boise",
+    "minZipCode": 83201,
+    "maxZipCode": 83877
+  },
+  {
+    "abbreviation": "IL",
+    "state": "Illinois",
+    "capital": "Springfield",
+    "minZipCode": 60001,
+    "maxZipCode": 62999
+  },
+  {
+    "abbreviation": "IN",
+    "state": "Indiana",
+    "capital": "Indianapolis",
+    "minZipCode": 46001,
+    "maxZipCode": 47997
+  },
+  {
+    "abbreviation": "IA",
+    "state": "Iowa",
+    "capital": "Des Moines",
+    "minZipCode": 50001,
+    "maxZipCode": 52809
+  },
+  {
+    "abbreviation": "KS",
+    "state": "Kansas",
+    "capital": "Topeka",
+    "minZipCode": 66002,
+    "maxZipCode": 67954
+  },
+  {
+    "abbreviation": "KY",
+    "state": "Kentucky",
+    "capital": "Frankfort",
+    "minZipCode": 40003,
+    "maxZipCode": 42788
+  },
+  {
+    "abbreviation": "LA",
+    "state": "Louisiana",
+    "capital": "Baton Rouge",
+    "minZipCode": 70001,
+    "maxZipCode": 71497
+  },
+  {
+    "abbreviation": "ME",
+    "state": "Maine",
+    "capital": "Augusta",
+    "minZipCode": 3901,
+    "maxZipCode": 4992
+  },
+  {
+    "abbreviation": "MD",
+    "state": "Maryland",
+    "capital": "Annapolis",
+    "minZipCode": 20588,
+    "maxZipCode": 21930
+  },
+  {
+    "abbreviation": "MA",
+    "state": "Massachusetts",
+    "capital": "Boston",
+    "minZipCode": 1001,
+    "maxZipCode": 5544
+  },
+  {
+    "abbreviation": "MI",
+    "state": "Michigan",
+    "capital": "Lansing",
+    "minZipCode": 48001,
+    "maxZipCode": 49971
+  },
+  {
+    "abbreviation": "MN",
+    "state": "Minnesota",
+    "capital": "Saint Paul",
+    "minZipCode": 55001,
+    "maxZipCode": 56763
+  },
+  {
+    "abbreviation": "MS",
+    "state": "Mississippi",
+    "capital": "Jackson",
+    "minZipCode": 38601,
+    "maxZipCode": 39776
+  },
+  {
+    "abbreviation": "MO",
+    "state": "Missouri",
+    "capital": "Jefferson City",
+    "minZipCode": 63001,
+    "maxZipCode": 65899
+  },
+  {
+    "abbreviation": "MT",
+    "state": "Montana",
+    "capital": "Helena",
+    "minZipCode": 59001,
+    "maxZipCode": 59937
+  },
+  {
+    "abbreviation": "NE",
+    "state": "Nebraska",
+    "capital": "Lincoln",
+    "minZipCode": 68001,
+    "maxZipCode": 69367
+  },
+  {
+    "abbreviation": "NV",
+    "state": "Nevada",
+    "capital": "Carson City",
+    "minZipCode": 88901,
+    "maxZipCode": 89883
+  },
+  {
+    "abbreviation": "NH",
+    "state": "New Hampshire",
+    "capital": "Concord",
+    "minZipCode": 3031,
+    "maxZipCode": 3897
+  },
+  {
+    "abbreviation": "NJ",
+    "state": "New Jersey",
+    "capital": "Trenton",
+    "minZipCode": 7001,
+    "maxZipCode": 8989
+  },
+  {
+    "abbreviation": "NM",
+    "state": "New Mexico",
+    "capital": "Santa Fe",
+    "minZipCode": 87001,
+    "maxZipCode": 88439
+  },
+  {
+    "abbreviation": "NY",
+    "state": "New York",
+    "capital": "Albany",
+    "minZipCode": 501,
+    "maxZipCode": 14925
+  },
+  {
+    "abbreviation": "NC",
+    "state": "North Carolina",
+    "capital": "Raleigh",
+    "minZipCode": 27006,
+    "maxZipCode": 28909
+  },
+  {
+    "abbreviation": "ND",
+    "state": "North Dakota",
+    "capital": "Bismarck",
+    "minZipCode": 58001,
+    "maxZipCode": 58856
+  },
+  {
+    "abbreviation": "OH",
+    "state": "Ohio",
+    "capital": "Columbus",
+    "minZipCode": 43001,
+    "maxZipCode": 45999
+  },
+  {
+    "abbreviation": "OK",
+    "state": "Oklahoma",
+    "capital": "Oklahoma City",
+    "minZipCode": 73001,
+    "maxZipCode": 74966
+  },
+  {
+    "abbreviation": "OR",
+    "state": "Oregon",
+    "capital": "Salem",
+    "minZipCode": 97001,
+    "maxZipCode": 97920
+  },
+  {
+    "abbreviation": "PA",
+    "state": "Pennsylvania",
+    "capital": "Harrisburg",
+    "minZipCode": 15001,
+    "maxZipCode": 19640
+  },
+  {
+    "abbreviation": "RI",
+    "state": "Rhode Island",
+    "capital": "Providence",
+    "minZipCode": 2801,
+    "maxZipCode": 2940
+  },
+  {
+    "abbreviation": "SC",
+    "state": "South Carolina",
+    "capital": "Columbia",
+    "minZipCode": 29001,
+    "maxZipCode": 29945
+  },
+  {
+    "abbreviation": "SD",
+    "state": "South Dakota",
+    "capital": "Pierre",
+    "minZipCode": 57001,
+    "maxZipCode": 57799
+  },
+  {
+    "abbreviation": "TN",
+    "state": "Tennessee",
+    "capital": "Nashville",
+    "minZipCode": 37010,
+    "maxZipCode": 38589
+  },
+  {
+    "abbreviation": "TX",
+    "state": "Texas",
+    "capital": "Austin",
+    "minZipCode": 73301,
+    "maxZipCode": 88595
+  },
+  {
+    "abbreviation": "UT",
+    "state": "Utah",
+    "capital": "Salt Lake City",
+    "minZipCode": 84001,
+    "maxZipCode": 84791
+  },
+  {
+    "abbreviation": "VT",
+    "state": "Vermont",
+    "capital": "Montpelier",
+    "minZipCode": 5001,
+    "maxZipCode": 5907
+  },
+  {
+    "abbreviation": "VA",
+    "state": "Virginia",
+    "capital": "Richmond",
+    "minZipCode": 20101,
+    "maxZipCode": 24658
+  },
+  {
+    "abbreviation": "WA",
+    "state": "Washington",
+    "capital": "Olympia",
+    "minZipCode": 98001,
+    "maxZipCode": 99403
+  },
+  {
+    "abbreviation": "WV",
+    "state": "West Virginia",
+    "capital": "Charleston",
+    "minZipCode": 24701,
+    "maxZipCode": 26886
+  },
+  {
+    "abbreviation": "WI",
+    "state": "Wisconsin",
+    "capital": "Madison,",
+    "minZipCode": 53001,
+    "maxZipCode": 54990
+  },
+  {
+    "abbreviation": "WY",
+    "state": "Wyoming",
+    "capital": "Cheyenne",
+    "minZipCode": 82001,
+    "maxZipCode": 83414
+  }
+]
+}
