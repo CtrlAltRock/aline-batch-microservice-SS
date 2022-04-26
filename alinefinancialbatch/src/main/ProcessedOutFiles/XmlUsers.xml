@@ -1,0 +1,37 @@
+<string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</string><user>
+  <id>0</id>
+  <firstName>Thanh</firstName>
+  <lastName>Feest</lastName>
+  <email>Thanh.Feest@smoothceeplusplus.com</email>
+  <cards/>
+</user><user>
+  <id>1</id>
+  <firstName>Kena</firstName>
+  <lastName>Corkery</lastName>
+  <email>Kena.Corkery@smoothceeplusplus.com</email>
+  <cards/>
+</user><user>
+  <id>2</id>
+  <firstName>Sylvie</firstName>
+  <lastName>Heidenreich</lastName>
+  <email>Sylvie.Heidenreich@smoothceeplusplus.com</email>
+  <cards/>
+</user><user>
+  <id>3</id>
+  <firstName>Tom</firstName>
+  <lastName>Leuschke</lastName>
+  <email>Tom.Leuschke@smoothceeplusplus.com</email>
+  <cards/>
+</user><user>
+  <id>4</id>
+  <firstName>Golda</firstName>
+  <lastName>Pacocha</lastName>
+  <email>Golda.Pacocha@smoothceeplusplus.com</email>
+  <cards/>
+</user><user>
+  <id>5</id>
+  <firstName>Israel</firstName>
+  <lastName>Schultz</lastName>
+  <email>Israel.Schultz@smoothceeplusplus.com</email>
+  <cards/>
+</user><string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</string><string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</string><string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</string>
