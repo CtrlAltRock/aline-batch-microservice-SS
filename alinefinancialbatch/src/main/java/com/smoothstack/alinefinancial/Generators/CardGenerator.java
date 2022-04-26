@@ -9,6 +9,7 @@ import com.vangogiel.luhnalgorithms.LuhnAlgorithms;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class CardGenerator {
 
@@ -20,6 +21,9 @@ public class CardGenerator {
         if(cardGeneratorInstance == null) cardGeneratorInstance = new CardGenerator();
         return cardGeneratorInstance;
     }
+    public synchronized void instantiateCard(Long userId, CardCache cardCache) {
+        cardCache.getGeneratedCards().put(userId, new HashSet<>());
+    }
 
     public synchronized void addGeneratedCard(Long userId, CardCache cc){
         cc.addGeneratedCard(userId, makeCard(userId));
@@ -30,12 +34,12 @@ public class CardGenerator {
         card.setId(incrementId);
         card.setNumber(Long.toString(LuhnAlgorithms.generateRandomLuhn(16)));
         card.setUserId(userId);
-        incrementId = incrementId+1;
-        System.out.println(card);
+        incrementId += 1;
         return card;
     }
 
     private boolean validCard(String card){
         return LuhnAlgorithms.isValid(card);
     }
+
 }

@@ -11,14 +11,9 @@ import java.util.List;
 
 public class ConsoleItemWriter extends AbstractItemStreamItemWriter {
 
-    private final UserCache userCache = new UserCache();
-    private final CardCache cardcache = new CardCache();
-
-
     @Override
     public void write(List items) throws Exception {
         items.stream().forEach(System.out::println);
         System.out.println(" ************ writing each chunk ***********");
-
     }
 }

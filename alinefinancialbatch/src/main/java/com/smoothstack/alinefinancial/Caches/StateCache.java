@@ -31,6 +31,7 @@ public class StateCache {
             entry("ME", new State("Maine", "ME", "Augusta", new ArrayList<String>())),
             entry("MD", new State("Maryland", "MD", "Annapolis", new ArrayList<String>())),
             entry("MA", new State("Massachusetts", "MA", "Boston", new ArrayList<String>())),
+            entry("MI", new State("Michigan", "MI", "Lansing", new ArrayList<String>())),
             entry("MN", new State("Minnesota", "MN", "Saint Paul", new ArrayList<String>())),
             entry("MS", new State("Mississippi", "MS", "Jackson", new ArrayList<String>())),
             entry("MO", new State("Missouri", "MO", "Jefferson City", new ArrayList<String>())),

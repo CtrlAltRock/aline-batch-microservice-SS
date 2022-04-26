@@ -22,6 +22,7 @@ public class UserGenerator {
     public synchronized User generateUser(Long userId, UserCache uc) {
         String firstName= faker.name().firstName();
         String lastName= faker.name().lastName();
+
         User user = new User();
         user.setId(userId);
         user.setFirstName(firstName);
@@ -29,7 +30,7 @@ public class UserGenerator {
         user.setEmail(firstName + "." + lastName + "@smoothceeplusplus.com");
         user.setCards(new ArrayList<>());
         uc.addGeneratedUser(userId, user);
-        //System.out.println(user);
+
         return user;
     }
 
