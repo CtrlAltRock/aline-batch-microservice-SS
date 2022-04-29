@@ -1,8 +1,10 @@
 package com.smoothstack.alinefinancial.Config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 
+@Slf4j(topic="CustomSkipPolicy")
 public class CustomSkipPolicy implements SkipPolicy {
 
     @Override

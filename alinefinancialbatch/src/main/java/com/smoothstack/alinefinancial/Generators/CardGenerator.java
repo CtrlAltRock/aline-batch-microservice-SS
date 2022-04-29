@@ -1,14 +1,9 @@
 package com.smoothstack.alinefinancial.Generators;
 
-import com.github.javafaker.Faker;
-//import com.smoothstack.alinefinancial.Caches.CardCache;
 import com.smoothstack.alinefinancial.Caches.CardCache;
 import com.smoothstack.alinefinancial.Models.Card;
-import com.smoothstack.alinefinancial.Models.User;
 import com.vangogiel.luhnalgorithms.LuhnAlgorithms;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class CardGenerator {
