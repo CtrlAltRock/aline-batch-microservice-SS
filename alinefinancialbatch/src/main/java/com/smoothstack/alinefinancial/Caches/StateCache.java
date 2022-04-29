@@ -1,6 +1,8 @@
 package com.smoothstack.alinefinancial.Caches;
 
 import com.smoothstack.alinefinancial.Models.State;
+import com.smoothstack.alinefinancial.Models.Transaction;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -8,7 +10,9 @@ import java.util.*;
 import static java.util.Map.entry;
 
 @Component
+@Slf4j(topic="StateCache")
 public class StateCache {
+
     Map<String, State> stateCache = Map.ofEntries(
             entry( "AL", new State("Alabama", "AL", "Montgomery", new ArrayList<String>())),
             entry("AK", new State("Alaska", "AK", "Juneau", new ArrayList<String>())),
@@ -61,6 +65,7 @@ public class StateCache {
             entry("WI", new State("Wisconsin", "WI", "Madison", new ArrayList<String>())),
             entry("WY", new State("Wyoming", "WY", "Cheyenne", new ArrayList<String>())),
             entry("DC", new State("Washington D.C.", "D.C.", "Washington D.C.", new ArrayList<String>()))
+            //entry("ONLINE", new State("ONLINE", "", "", new ArrayList<String>()))
 
     );
 
@@ -76,21 +81,26 @@ public class StateCache {
     }
 
     public HashMap<String, State> getSeenStates() {
-        return seenStates;
+        return getInstance().seenStates;
     }
 
-    public State addSeenStatesAndZip(String stateId, String zip) {
+    public State addSeenStatesAndZip(Transaction item) {
         State state = null;
-        if(seenStates.containsKey(stateId)) {
-            if(!seenStates.get(stateId).getZipCodes().contains(zip)) {
-                seenStates.get(stateId).getZipCodes().add(zip);
-                state = seenStates.get(stateId);
+        if(!item.getMerchant_city().equals("ONLINE")){
+            if(getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
+                if(getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
+                    getInstance().getSeenStates().get(item.getMerchant_state()).setZipCodes(new ArrayList<String>());
+                }
+                if(!getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().contains(item.getMerchant_zip())) {
+                    getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
+                    state = getInstance().getSeenStates().get(item.getMerchant_state());
+                }
             }
-        }
-        else {
-            seenStates.put(stateId, stateCache.get(stateId));
-            seenStates.get(stateId).getZipCodes().add(zip);
-            state = seenStates.get(stateId);
+            else {
+                getInstance().getSeenStates().put(item.getMerchant_state(), stateCache.get(item.getMerchant_state()));
+                getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
+                state = getInstance().getSeenStates().get(item.getMerchant_state());
+            }
         }
         return state;
     }
