@@ -13,18 +13,23 @@ public class CardGenerator {
     private Long incrementId = 0L;
 
     public static CardGenerator getInstance(){
-        if(cardGeneratorInstance == null) cardGeneratorInstance = new CardGenerator();
+        if(cardGeneratorInstance == null)
+            synchronized (CardGenerator.class) {
+                if (cardGeneratorInstance == null) {
+                    cardGeneratorInstance = new CardGenerator();
+                }
+            }
         return cardGeneratorInstance;
     }
-    public synchronized void instantiateCard(Long userId, CardCache cardCache) {
+    public void instantiateCard(Long userId, CardCache cardCache) {
         cardCache.getGeneratedCards().put(userId, new HashSet<>());
     }
 
-    public synchronized void addGeneratedCard(Long userId, CardCache cc){
+    public void addGeneratedCard(Long userId, CardCache cc){
         cc.addGeneratedCard(userId, makeCard(userId));
     }
 
-    private synchronized Card makeCard(Long userId){
+    private Card makeCard(Long userId){
         Card card = new Card();
         card.setId(incrementId);
         card.setNumber(Long.toString(LuhnAlgorithms.generateRandomLuhn(16)));

@@ -11,6 +11,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j(topic = "BatchConfig")
@@ -48,15 +50,24 @@ public class BatchConfig {
 
     @Bean
     public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor("taskExecutor");
+        /*ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();*/
+
+        SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor("taskExecutor");
+        taskExecutor.setThreadNamePrefix("aline-batch");
+        return taskExecutor;
     }
 
     @Bean
     public Flow splitFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .split(taskExecutor())
-                .add(merchantFlow(), userFlow(), stateFlow(), cardFlow())
-                .build();
+                .add(merchantFlow(), userFlow(), stateFlow(), cardFlow(), analysisProcessorFlow())
+                .next(analysisFlow())
+                .next(reportFlow())
+                .end();
     }
 
     @Bean
@@ -92,10 +103,24 @@ public class BatchConfig {
     }
 
     @Bean
-    public Flow transactionFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("transactionFlow")
-                .start(transactionStep())
-                .next(xmlTransactionWriterStep())
+    public Flow analysisProcessorFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("analysisProcessorFlow")
+                .start(analysisProcessorStep())
+                .build();
+    }
+
+
+    @Bean
+    public Flow analysisFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("analysisFlow")
+                .start(analysisStep())
+                .build();
+    }
+
+    @Bean
+    public Flow reportFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("reportFlow")
+                .start(reportStep())
                 .build();
     }
 
@@ -128,118 +153,21 @@ public class BatchConfig {
     }
 
     @Bean
-    public Step xmlTransactionWriterStep() {
-        return stepsFactory.get("xmlTransactionWriterStep")
-                .tasklet(new XmlTransactionWriterTasklet())
+    public Step analysisStep() throws Exception {
+        return stepsFactory.get("analysisTaskletStep")
+                .tasklet(new AnalysisTasklet())
                 .build();
     }
 
     @Bean
-    public Step merchantStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(6);
-        taskExecutor.setMaxPoolSize(500);
-        taskExecutor.afterPropertiesSet();
-
-        //noinspection unchecked
-        return stepsFactory.get("merchantStep")
-                .<Transaction, Object>chunk(50000)
-                .reader(csvReader())
-                .processor(new MerchantProcessor())
-                .writer(new ConsoleItemWriter())
-                .faultTolerant()
-                .skipPolicy(new CustomSkipPolicy())
-                .retryLimit(1)
-                .retry(IllegalArgumentException.class)
-                .taskExecutor(taskExecutor)
+    public Step reportStep() throws Exception {
+        return stepsFactory.get("reportTaskletStep")
+                .tasklet(new ReportTasklet())
                 .build();
     }
 
     @Bean
-    public Step userStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(6);
-        taskExecutor.setMaxPoolSize(500);
-        taskExecutor.afterPropertiesSet();
-
-        //noinspection unchecked
-        return stepsFactory.get("userStep")
-                .<Transaction, Object>chunk(50000)
-                .reader(csvReader())
-                .processor(new UserProcessor())
-                .writer(new ConsoleItemWriter())
-                .faultTolerant()
-                .skipPolicy(new CustomSkipPolicy())
-                .retryLimit(1)
-                .retry(IllegalArgumentException.class)
-                .taskExecutor(taskExecutor)
-                .build();
-    }
-
-    @Bean
-    public Step stateStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(6);
-        taskExecutor.setMaxPoolSize(500);
-        taskExecutor.afterPropertiesSet();
-
-        //noinspection unchecked
-        return stepsFactory.get("stateStep")
-                .<Transaction, Object>chunk(50000)
-                .reader(csvReader())
-                .processor(new StateProcessor())
-                .writer(new ConsoleItemWriter())
-                .faultTolerant()
-                .skipPolicy(new CustomSkipPolicy())
-                .retryLimit(1)
-                .retry(IllegalArgumentException.class)
-                .taskExecutor(taskExecutor)
-                .build();
-    }
-
-    @Bean
-    public Step cardStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(6);
-        taskExecutor.setMaxPoolSize(500);
-        taskExecutor.afterPropertiesSet();
-
-        //noinspection unchecked
-        return stepsFactory.get("cardStep")
-                .<Transaction, Object>chunk(50000)
-                .reader(csvReader())
-                .processor(new CardProcessor())
-                .writer(new ConsoleItemWriter())
-                .faultTolerant()
-                .skipPolicy(new CustomSkipPolicy())
-                .retryLimit(1)
-                .retry(IllegalArgumentException.class)
-                .taskExecutor(taskExecutor)
-                .build();
-    }
-
-    @Bean
-    public Step transactionStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(6);
-        taskExecutor.setMaxPoolSize(500);
-        taskExecutor.afterPropertiesSet();
-
-        //noinspection unchecked
-        return stepsFactory.get("transactionStep")
-                .<Transaction, Object>chunk(50000)
-                .reader(csvReader())
-                .processor(new TransactionProcessor())
-                .writer(new ConsoleItemWriter())
-                .faultTolerant()
-                .skipPolicy(new CustomSkipPolicy())
-                .retryLimit(1)
-                .retry(IllegalArgumentException.class)
-                .taskExecutor(taskExecutor)
-                .build();
-    }
-
-    @Bean
+    @StepScope
     public FlatFileItemReader<Transaction> csvReader() {
         return new FlatFileItemReaderBuilder<Transaction>()
                 .name("csvReader")
@@ -251,6 +179,116 @@ public class BatchConfig {
                 .fieldSetMapper(new BeanWrapperFieldSetMapper<Transaction>() {{
                     setTargetType(Transaction.class);
                 }})
+                .build();
+    }
+
+    @Bean
+    public Step merchantStep() throws Exception {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setThreadNamePrefix("merchantStep");
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();
+
+        //noinspection unchecked
+        return stepsFactory.get("merchantStep")
+                .<Transaction, Object>chunk(50000)
+                .reader(csvReader())
+                .processor(new MerchantProcessor())
+                .writer(new ConsoleItemWriter())
+                .faultTolerant()
+                .skipPolicy(new CustomSkipPolicy())
+                .retryLimit(1)
+                .retry(Exception.class)
+                .taskExecutor(taskExecutor)
+                .build();
+    }
+
+    @Bean
+    public Step userStep() throws Exception {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setThreadNamePrefix("userStep");
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();
+
+        //noinspection unchecked
+        return stepsFactory.get("userStep")
+                .<Transaction, Object>chunk(50000)
+                .reader(csvReader())
+                .processor(new UserProcessor())
+                .writer(new ConsoleItemWriter())
+                .faultTolerant()
+                .skipPolicy(new CustomSkipPolicy())
+                .retryLimit(1)
+                .retry(Exception.class)
+                .taskExecutor(taskExecutor)
+                .build();
+    }
+
+    @Bean
+    public Step stateStep() throws Exception {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setThreadNamePrefix("stateStep");
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();
+
+        //noinspection unchecked
+        return stepsFactory.get("stateStep")
+                .<Transaction, Object>chunk(50000)
+                .reader(csvReader())
+                .processor(new StateProcessor())
+                .writer(new ConsoleItemWriter())
+                .faultTolerant()
+                .skipPolicy(new CustomSkipPolicy())
+                .retryLimit(1)
+                .retry(Exception.class)
+                .taskExecutor(taskExecutor)
+                .build();
+    }
+
+    @Bean
+    public Step cardStep() throws Exception {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setThreadNamePrefix("cardStep");
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();
+
+        //noinspection unchecked
+        return stepsFactory.get("cardStep")
+                .<Transaction, Object>chunk(50000)
+                .reader(csvReader())
+                .processor(new CardProcessor())
+                .writer(new ConsoleItemWriter())
+                .faultTolerant()
+                .skipPolicy(new CustomSkipPolicy())
+                .retryLimit(1)
+                .retry(Exception.class)
+                .taskExecutor(taskExecutor)
+                .build();
+    }
+
+    @Bean
+    public Step analysisProcessorStep() throws Exception {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setThreadNamePrefix("analysisProcessorStep");
+        taskExecutor.setCorePoolSize(512);
+        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.afterPropertiesSet();
+
+        //noinspection unchecked
+        return stepsFactory.get("analysisStep")
+                .<Transaction, Object>chunk(50000)
+                .reader(csvReader())
+                .processor(new AnalysisProcessor())
+                .writer(new ConsoleItemWriter())
+                .faultTolerant()
+                .skipPolicy(new CustomSkipPolicy())
+                .retryLimit(1)
+                .retry(Exception.class)
+                .taskExecutor(taskExecutor)
                 .build();
     }
 }

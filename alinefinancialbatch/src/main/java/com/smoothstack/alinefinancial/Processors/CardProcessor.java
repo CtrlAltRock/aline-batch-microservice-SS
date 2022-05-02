@@ -15,8 +15,11 @@ public class CardProcessor extends ItemListenerSupport<Transaction, Object> impl
 
     @Override
     public Transaction process(Transaction item) {
-        cardCache.findOrGenerateCard(item.getUser(), item.getCard());
-
+        try {
+            cardCache.findOrGenerateCard(item.getUser(), item.getCard());
+        } catch (Exception e) {
+            log.info(e.toString());
+        }
         return null;
     }
 }

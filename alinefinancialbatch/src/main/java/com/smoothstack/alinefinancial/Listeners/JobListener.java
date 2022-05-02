@@ -10,9 +10,6 @@ public class JobListener implements JobExecutionListener {
     public void beforeJob(JobExecution jobExecution) {
         System.out.println("before starting the Job - Job Name:" + jobExecution.getJobInstance().getJobName());
         System.out.println("before starting the Job" + jobExecution.getExecutionContext().toString());
-
-        jobExecution.getExecutionContext().put("my name", "sam");
-        System.out.println("before starting the Job - after set" + jobExecution.getExecutionContext().toString());
     }
 
     @Override

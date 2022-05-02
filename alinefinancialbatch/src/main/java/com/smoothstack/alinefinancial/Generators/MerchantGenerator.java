@@ -12,19 +12,21 @@ public class MerchantGenerator {
 
     public static MerchantGenerator getInstance() {
         if(merchantGeneratorInstance == null) {
-            merchantGeneratorInstance = new MerchantGenerator();
+            synchronized (MerchantGenerator.class) {
+                if(merchantGeneratorInstance == null) {
+                    merchantGeneratorInstance = new MerchantGenerator();
+                }
+            }
         }
         return merchantGeneratorInstance;
     }
 
-    public synchronized Merchant generateMerchant(String name, String code, MerchantCache mc) {
+    public Merchant generateMerchant(String name, String code, MerchantCache mc) {
         String companyName = faker.company().name();
-
         Merchant merchant = new Merchant();
         merchant.setName(companyName);
         merchant.setMcc(code);
         mc.addGeneratedMerchant(name, merchant);
-
         return merchant;
     }
 
