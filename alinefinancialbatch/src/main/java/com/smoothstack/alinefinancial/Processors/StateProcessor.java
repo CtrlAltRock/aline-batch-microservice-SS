@@ -16,10 +16,11 @@ public class StateProcessor extends ItemListenerSupport<Transaction, Object> imp
 
     @Override
     public Transaction process(Transaction item) throws Exception {
-
-
-
-        stateCache.addSeenStatesAndZip(item);
+        try {
+            stateCache.addSeenStatesAndZip(item);
+        } catch (Exception e) {
+            log.info(e.toString());
+        }
         return null;
     }
 }

@@ -8,14 +8,20 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
+
 @Slf4j(topic="MerchantProcessor")
 public class MerchantProcessor extends ItemListenerSupport<Transaction, Object> implements ItemProcessor<Transaction, Object> {
 
-    private final MerchantCache merchantCache = MerchantCache.getInstance();
+    private MerchantCache merchantCache = MerchantCache.getInstance();
 
     @Override
     public Transaction process(Transaction item) throws Exception {
-        Merchant merchant = merchantCache.findMerchantOrGenerate(item.getMerchant_name(), item.getMcc());
+        try {
+            Merchant merchant = merchantCache.findMerchantOrGenerate(item.getMerchant_name(), item.getMcc());
+        } catch (Exception e) {
+            log.info(e.toString());
+        }
         return null;
     }
 }

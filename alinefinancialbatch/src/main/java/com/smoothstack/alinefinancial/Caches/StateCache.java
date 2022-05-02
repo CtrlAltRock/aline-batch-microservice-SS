@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Map.entry;
 
@@ -64,7 +65,7 @@ public class StateCache {
             entry("WV", new State("West Virginia", "WV", "Charleston", new ArrayList<String>())),
             entry("WI", new State("Wisconsin", "WI", "Madison", new ArrayList<String>())),
             entry("WY", new State("Wyoming", "WY", "Cheyenne", new ArrayList<String>())),
-            entry("DC", new State("Washington D.C.", "D.C.", "Washington D.C.", new ArrayList<String>()))
+            entry("D.C.", new State("Washington D.C.", "D.C.", "Washington D.C.", new ArrayList<String>()))
             //entry("ONLINE", new State("ONLINE", "", "", new ArrayList<String>()))
 
     );
@@ -75,7 +76,11 @@ public class StateCache {
 
     public static StateCache getInstance() {
         if(stateCacheInstance == null) {
-            stateCacheInstance = new StateCache();
+            synchronized (StateCache.class) {
+                if (stateCacheInstance == null) {
+                    stateCacheInstance = new StateCache();
+                }
+            }
         }
         return stateCacheInstance;
     }
@@ -86,17 +91,23 @@ public class StateCache {
 
     public State addSeenStatesAndZip(Transaction item) {
         State state = null;
-        if(!item.getMerchant_city().equals("ONLINE")){
-            if(getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
-                if(getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
+        // Not a state that exists could be a country since product owner doesn't know that countries are in transaction file
+        if (item.getMerchant_state() != null && stateCache.get(item.getMerchant_state()) == null && !item.getMerchant_city().equals("ONLINE")) {
+            State newCountry = new State(item.getMerchant_state(), "unknown", "unknown", new ArrayList<String>());
+            if (item.getMerchant_zip() != null) {
+                newCountry.addZipCodes(item.getMerchant_zip());
+            }
+            getInstance().seenStates.put(item.getMerchant_state(), newCountry);
+        } else if (!item.getMerchant_city().equals("ONLINE")) {
+            if (getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
+                if (getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
                     getInstance().getSeenStates().get(item.getMerchant_state()).setZipCodes(new ArrayList<String>());
                 }
-                if(!getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().contains(item.getMerchant_zip())) {
+                if (!getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().contains(item.getMerchant_zip())) {
                     getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
                     state = getInstance().getSeenStates().get(item.getMerchant_state());
                 }
-            }
-            else {
+            } else {
                 getInstance().getSeenStates().put(item.getMerchant_state(), stateCache.get(item.getMerchant_state()));
                 getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
                 state = getInstance().getSeenStates().get(item.getMerchant_state());

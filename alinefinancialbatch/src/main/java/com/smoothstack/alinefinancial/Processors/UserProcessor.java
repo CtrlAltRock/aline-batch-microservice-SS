@@ -11,15 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j(topic = "UserProcessor")
 public class UserProcessor extends ItemListenerSupport<Transaction, Object> implements ItemProcessor<Transaction, Object> {
 
-    private static final UserCache userCache = UserCache.getInstance();
+    private static UserCache userCache = UserCache.getInstance();
 
-    private final CardCache cardCache = CardCache.getInstance();
+    private CardCache cardCache = CardCache.getInstance();
 
 
     @Override
     public Transaction process(Transaction item) throws Exception {
-        userCache.findUserOrGenerate(item.getUser());
-        cardCache.findOrGenerateCard(item.getUser(), item.getCard());
+        try {
+            userCache.findUserOrGenerate(item.getUser());
+            cardCache.findOrGenerateCard(item.getUser(), item.getCard());
+        } catch (Exception e) {
+            log.info(e.toString());
+        }
         return null;
     }
 }

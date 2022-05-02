@@ -6,12 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j(topic="UserCache")
 public class UserCache {
 
-    private final Map<Long, User> syncGeneratedUsers = Collections.synchronizedMap(new HashMap<>());
+    private final HashMap<Long, User> syncGeneratedUsers = new HashMap<>();
+
+ //   private final Map<Long, User> syncGeneratedUsers = Collections.synchronizedMap(new HashMap<>());
     private static UserCache userCacheInstance = null;
 
     public static UserCache getInstance() {
@@ -19,7 +22,7 @@ public class UserCache {
         return userCacheInstance;
     }
 
-    public synchronized void addGeneratedUser(Long userId, User user){
+    public void addGeneratedUser(Long userId, User user){
         syncGeneratedUsers.put(userId, user);
     }
 
@@ -27,7 +30,7 @@ public class UserCache {
         return syncGeneratedUsers.get(userId);
     }
 
-    public Map<Long, User> getGeneratedUsers(){
+    public HashMap<Long, User> getGeneratedUsers(){
         return syncGeneratedUsers;
     }
 
