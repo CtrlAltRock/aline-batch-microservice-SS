@@ -1,27 +1,30 @@
 package com.smoothstack.alinefinancial.Processors;
 
-import com.smoothstack.alinefinancial.Caches.MerchantCache;
+import com.smoothstack.alinefinancial.Maps.MerchantMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashSet;
 
 @Slf4j(topic="MerchantProcessor")
-public class MerchantProcessor extends ItemListenerSupport<Transaction, Object> implements ItemProcessor<Transaction, Object> {
+public class MerchantProcessor implements ItemProcessor<Transaction, Transaction> {
 
-    private MerchantCache merchantCache = MerchantCache.getInstance();
+    private MerchantMap merchantCache = MerchantMap.getInstance();
+    private Long transactionLine = 1L;
 
     @Override
     public Transaction process(Transaction item) throws Exception {
         try {
-            Merchant merchant = merchantCache.findMerchantOrGenerate(item.getMerchant_name(), item.getMcc());
+            Merchant merchant = merchantCache.findMerchantOrGenerate(item.getMerchant_name(), item.getMcc(), item.getAmount());
+            transactionLine++;
         } catch (Exception e) {
-            log.info(e.toString());
+            StringBuilder errorString = new StringBuilder();
+            errorString.append(e);
+            errorString.append(" on transaction line: ");
+            errorString.append(transactionLine);
+
+            log.info(errorString.toString());
         }
-        return null;
+        return item;
     }
 }

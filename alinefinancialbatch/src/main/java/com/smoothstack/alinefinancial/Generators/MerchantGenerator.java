@@ -1,8 +1,10 @@
 package com.smoothstack.alinefinancial.Generators;
 
 import com.github.javafaker.Faker;
-import com.smoothstack.alinefinancial.Caches.MerchantCache;
+import com.smoothstack.alinefinancial.Maps.MerchantMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
+
+import java.util.HashMap;
 
 public class MerchantGenerator {
 
@@ -21,11 +23,13 @@ public class MerchantGenerator {
         return merchantGeneratorInstance;
     }
 
-    public Merchant generateMerchant(String name, String code, MerchantCache mc) {
+    public Merchant generateMerchant(String name, String code, String amt, MerchantMap mc) {
         String companyName = faker.company().name();
         Merchant merchant = new Merchant();
         merchant.setName(companyName);
         merchant.setMcc(code);
+        merchant.setTransactionsByAmt(new HashMap<>());
+        merchant.addAmount(amt);
         mc.addGeneratedMerchant(name, merchant);
         return merchant;
     }

@@ -1,29 +1,21 @@
-package com.smoothstack.alinefinancial.Caches;
+package com.smoothstack.alinefinancial.Maps;
 
 import com.smoothstack.alinefinancial.Generators.MerchantGenerator;
 import com.smoothstack.alinefinancial.Models.Merchant;
-import com.smoothstack.alinefinancial.Processors.MerchantProcessor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 @Slf4j(topic="MerchantCache")
-public class MerchantCache {
+public class MerchantMap {
 
     private final HashMap<String, Merchant> generatedMerchants = new HashMap<>();
     private static MerchantGenerator merchantGenerator = MerchantGenerator.getInstance();
-    private static MerchantCache merchantCacheInstance = null;
+    private static MerchantMap merchantCacheInstance = null;
 
-    public static MerchantCache getInstance() {
+    public static MerchantMap getInstance() {
         if(merchantCacheInstance == null) {
-            synchronized (MerchantCache.class) {
-                if(merchantCacheInstance == null) {
-                    merchantCacheInstance = new MerchantCache();
-                }
-            }
+            merchantCacheInstance = new MerchantMap();
         }
         return merchantCacheInstance;
     }
@@ -40,11 +32,11 @@ public class MerchantCache {
         return generatedMerchants;
     }
 
-    public Merchant findMerchantOrGenerate(String nameId, String code) {
+    public Merchant findMerchantOrGenerate(String nameId, String code, String amt) {
         if(getGeneratedMerchant(nameId) == null) {
-            synchronized (MerchantGenerator.class) {
+            synchronized (MerchantMap.class) {
                 if(getGeneratedMerchant(nameId) == null) {
-                    Merchant merchant = merchantGenerator.generateMerchant(nameId, code,  this);
+                    Merchant merchant = merchantGenerator.generateMerchant(nameId, code, amt,  this);
                 }
             }
         }

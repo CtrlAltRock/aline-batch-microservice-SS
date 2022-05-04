@@ -1,26 +1,29 @@
 package com.smoothstack.alinefinancial.Processors;
 
-import com.smoothstack.alinefinancial.Caches.StateCache;
-import com.smoothstack.alinefinancial.Models.State;
+import com.smoothstack.alinefinancial.Maps.StateMap;
 import com.smoothstack.alinefinancial.Models.Transaction;
-import com.smoothstack.alinefinancial.Models.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j(topic = "StateProcessor")
-public class StateProcessor extends ItemListenerSupport<Transaction, Object> implements ItemProcessor<Transaction, Object> {
+public class StateProcessor implements ItemProcessor<Transaction, Transaction> {
 
-    private static StateCache stateCache = new StateCache();
+    private static StateMap stateCache = new StateMap();
+    private Long transactionLine = 1L;
 
     @Override
     public Transaction process(Transaction item) throws Exception {
         try {
             stateCache.addSeenStatesAndZip(item);
+            transactionLine++;
         } catch (Exception e) {
-            log.info(e.toString());
+            StringBuilder errorString = new StringBuilder();
+            errorString.append(e);
+            errorString.append(" on ");
+            errorString.append(transactionLine);
+
+            log.info(errorString.toString());
         }
-        return null;
+        return item;
     }
 }
