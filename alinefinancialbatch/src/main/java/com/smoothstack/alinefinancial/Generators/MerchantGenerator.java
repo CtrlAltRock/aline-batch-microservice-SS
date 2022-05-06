@@ -3,9 +3,10 @@ package com.smoothstack.alinefinancial.Generators;
 import com.github.javafaker.Faker;
 import com.smoothstack.alinefinancial.Maps.MerchantMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
-
+import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 
+@Slf4j(topic = "MerchantGenerator")
 public class MerchantGenerator {
 
     private static MerchantGenerator merchantGeneratorInstance = null;
@@ -13,24 +14,40 @@ public class MerchantGenerator {
     private final Faker faker = new Faker();
 
     public static MerchantGenerator getInstance() {
-        if(merchantGeneratorInstance == null) {
-            synchronized (MerchantGenerator.class) {
-                if(merchantGeneratorInstance == null) {
-                    merchantGeneratorInstance = new MerchantGenerator();
+        try {
+            if (merchantGeneratorInstance == null) {
+                synchronized (MerchantGenerator.class) {
+                    if (merchantGeneratorInstance == null) {
+                        merchantGeneratorInstance = new MerchantGenerator();
+                    }
                 }
             }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: getInstance\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
         return merchantGeneratorInstance;
     }
 
-    public Merchant generateMerchant(String name, String code, String amt, MerchantMap mc) {
-        String companyName = faker.company().name();
+    public Merchant generateMerchant(Long lineId, String name, String code, String amt, MerchantMap mc) {
         Merchant merchant = new Merchant();
-        merchant.setName(companyName);
-        merchant.setMcc(code);
-        merchant.setTransactionsByAmt(new HashMap<>());
-        merchant.addAmount(amt);
-        mc.addGeneratedMerchant(name, merchant);
+        try {
+            String companyName = faker.company().name();
+            merchant.setId(lineId);
+            merchant.setName(companyName);
+            merchant.setMcc(code);
+            merchant.setTransactionsByAmt(new HashMap<>());
+            Double amtDouble = Double.parseDouble(amt.replace("$", ""));
+            merchant.addAmount(amtDouble);
+            mc.addGeneratedMerchant(name, merchant);
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: generateMerchant\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
         return merchant;
     }
 

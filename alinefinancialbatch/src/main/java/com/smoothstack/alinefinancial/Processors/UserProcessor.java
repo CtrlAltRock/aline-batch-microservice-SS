@@ -44,10 +44,11 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
         } catch (Exception e) {
             StringBuilder errorString = new StringBuilder();
             errorString.append(e);
-            errorString.append(" on ");
+            errorString.append(" on transaction line: ");
             errorString.append(transactionLine);
 
-            log.info(errorString.toString());
+            log.error(item.toString());
+            log.error(errorString.toString());
         }
         return item;
     }

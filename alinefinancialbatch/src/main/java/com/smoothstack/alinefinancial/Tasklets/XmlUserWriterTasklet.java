@@ -20,9 +20,9 @@ public class XmlUserWriterTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
             XStream userXStream = new XStream();
-            userXStream.alias("user", User.class);
+            userXStream.alias("User", User.class);
             userXStream.omitField(User.class, "cards");
-            userXStream.omitField(User.class, "deposits");
+            userXStream.omitField(User.class, "deposit");
             FileWriter userFile = new FileWriter("src/main/ProcessedOutFiles/XmlUsers.xml");
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -34,7 +34,7 @@ public class XmlUserWriterTasklet implements Tasklet {
             userFile.append(stringBuilder);
             userFile.close();
         } catch(Exception e) {
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }

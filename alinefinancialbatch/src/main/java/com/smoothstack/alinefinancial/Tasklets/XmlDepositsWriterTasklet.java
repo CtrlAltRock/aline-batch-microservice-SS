@@ -21,8 +21,8 @@ public class XmlDepositsWriterTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try{
             XStream depositXStream = new XStream();
-            depositXStream.alias("deposits", User.class);
-            depositXStream.alias("transaction", Transaction.class);
+            depositXStream.alias("Deposits", User.class);
+            depositXStream.alias("Transaction", Transaction.class);
             depositXStream.omitField(User.class, "email");
             depositXStream.omitField(User.class, "cards");
             depositXStream.omitField(User.class, "insufficientBalanceTransactions");
@@ -49,7 +49,7 @@ public class XmlDepositsWriterTasklet implements Tasklet {
             userDepositsWriter.close();
 
         } catch (Exception e) {
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package com.smoothstack.alinefinancial.Models;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,7 +13,8 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlRootElement(name="user")
+@Slf4j(topic = "User")
+@XmlRootElement(name="User")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class User {
 
@@ -31,14 +33,28 @@ public class User {
     //Not using this for now, may end up using later for analysis
     //private List<Transaction> transactions;
 
-    private List<Transaction> deposits;
+    private List<Transaction> deposit;
 
-    public void setCard(Card card){
-        cards.add(card);
+    public synchronized void setCard(Card card){
+        try {
+            cards.add(card);
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: setCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 
 
-    public void addDeposit(Transaction item) {
-        deposits.add(item);
+    public synchronized void addDeposit(Transaction item) {
+        try {
+            deposit.add(item);
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addDeposit\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 }

@@ -6,38 +6,54 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
-@Slf4j(topic="UserCache")
+@Slf4j(topic="UserMap")
 public class UserMap {
 
     private final HashMap<Long, User> generatedUsers = new HashMap<>();
-    private static UserMap userCacheInstance = null;
+    private static UserMap userMapInstance = null;
 
     public static UserMap getInstance() {
-        if(userCacheInstance == null) userCacheInstance = new UserMap();
-        return userCacheInstance;
+        if(userMapInstance == null) userMapInstance = new UserMap();
+        return userMapInstance;
     }
 
-    public void addGeneratedUser(Long userId, User user){
-        generatedUsers.put(userId, user);
+    public synchronized void addGeneratedUser(Long userId, User user){
+        try {
+            generatedUsers.put(userId, user);
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addGeneratedUser\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 
-    public User getGeneratedUser(Long userId){
+    public synchronized User getGeneratedUser(Long userId){
         return generatedUsers.get(userId);
     }
 
-    public HashMap<Long, User> getGeneratedUsers(){
+    public synchronized HashMap<Long, User> getGeneratedUsers(){
         return generatedUsers;
     }
 
-    public User findUserOrGenerate(Long userId){
-        UserGenerator userGenerator = UserGenerator.getInstance();
-        if(getGeneratedUser(userId) == null){
-            synchronized (UserMap.class){
-                if(getGeneratedUser(userId) == null){
-                    userGenerator.generateUser(userId, this);
+    public synchronized User findUserOrGenerate(Long userId){
+        try {
+            UserGenerator userGenerator = UserGenerator.getInstance();
+            if (getGeneratedUser(userId) == null) {
+                synchronized (UserMap.class) {
+                    if (getGeneratedUser(userId) == null) {
+                        userGenerator.generateUser(userId, this);
+                    }
                 }
             }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: findUserOrGenerate\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
+
+        // shouldn't worry about any exceptions coming from here, would just return null
         return getGeneratedUser(userId);
     }
 

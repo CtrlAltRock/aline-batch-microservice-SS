@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j(topic = "State")
-@XmlRootElement(name="state")
+@XmlRootElement(name="State")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class State {
 
@@ -27,8 +27,16 @@ public class State {
     private List<String> zipCodes;
 
     public void addZipCodes(String zip) {
-        if(!zipCodes.contains(zip)) {
-            zipCodes.add(zip);
+
+        try {
+            if (!zipCodes.contains(zip)) {
+                zipCodes.add(zip);
+            }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addZipCodes\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
     }
 }

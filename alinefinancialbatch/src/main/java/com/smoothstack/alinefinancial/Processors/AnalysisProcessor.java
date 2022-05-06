@@ -7,11 +7,9 @@ import org.springframework.batch.item.ItemProcessor;
 public class AnalysisProcessor implements ItemProcessor<Transaction, Transaction> {
 
     private final AnalysisMap analysisMap = AnalysisMap.getInstance();
-    private Integer deposits = 0;
 
     @Override
     public Transaction process(Transaction item) throws Exception {
         return item;
     }
-
 }

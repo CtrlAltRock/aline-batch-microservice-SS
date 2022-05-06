@@ -9,12 +9,16 @@ import org.springframework.stereotype.Component;
 @Slf4j(topic="CustomSkipPolicy")
 public class CustomSkipPolicy implements SkipPolicy {
 
+    private StringBuilder skipMessage = new StringBuilder();
+
     @Override
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
         if (t instanceof Throwable){
             skipCount++;
-            log.info(t.toString());
-            log.info("skipCount: " + skipCount);
+            skipMessage.append("skipCount: ");
+            skipMessage.append(skipCount);
+            log.error(t.toString());
+            log.error(skipMessage.toString());
             return true;
         }
 

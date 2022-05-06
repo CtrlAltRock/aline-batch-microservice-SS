@@ -8,24 +8,31 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 import java.util.HashSet;
 
-@Slf4j(topic="CardCache")
+@Slf4j(topic="CardMap")
 public class CardMap {
     private final HashMap<Long, HashSet<Card>> generatedCards = new HashMap<>();
 
-    private static CardMap cardCacheInstance = null;
+    private static CardMap cardMapInstance = null;
 
     public static CardMap getInstance(){
-        if(cardCacheInstance == null) {
-            cardCacheInstance = new CardMap();
+        if(cardMapInstance == null) {
+            cardMapInstance = new CardMap();
         }
-        return cardCacheInstance;
+        return cardMapInstance;
     }
 
-    public void addGeneratedCard(Long userId, Card card){
-        HashSet<Card> cards = generatedCards.get(userId);
-        if(cards == null) cards = new HashSet<>();
-        cards.add(card);
-        generatedCards.put(userId, cards);
+    public synchronized void addGeneratedCard(Long userId, Card card){
+        try {
+            HashSet<Card> cards = generatedCards.get(userId);
+            if (cards == null) cards = new HashSet<>();
+            cards.add(card);
+            generatedCards.put(userId, cards);
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addGenerateCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 
     public synchronized HashSet<Card> getGeneratedUserCards(Long userId){
@@ -37,21 +44,27 @@ public class CardMap {
     }
 
     public synchronized void findOrGenerateCard(Long userId, Long cardIndex) {
-        CardGenerator cardGenerator = CardGenerator.getInstance();
-        if(getGeneratedUserCards(userId) == null) {
-            synchronized (CardGenerator.class) {
-                if(getGeneratedUserCards(userId) == null) cardGenerator.addGeneratedCard(userId, this);
+        try {
+            CardGenerator cardGenerator = CardGenerator.getInstance();
+            if (getGeneratedUserCards(userId) == null) {
+                synchronized (CardGenerator.class) {
+                    if (getGeneratedUserCards(userId) == null) cardGenerator.addGeneratedCard(userId, this);
+                }
             }
-        }
-        if(getGeneratedUserCards(userId).size() < cardIndex + 1) {
-            synchronized (CardGenerator.class)
-            {
-                if(getGeneratedUserCards(userId).size() < cardIndex + 1){
-                    for(int i = getGeneratedUserCards(userId).size(); i<=cardIndex + 1; i++) {
-                        cardGenerator.addGeneratedCard(userId, this);
+            if (getGeneratedUserCards(userId).size() < cardIndex + 1) {
+                synchronized (CardGenerator.class) {
+                    if (getGeneratedUserCards(userId).size() < cardIndex + 1) {
+                        for (int i = getGeneratedUserCards(userId).size(); i <= cardIndex + 1; i++) {
+                            cardGenerator.addGeneratedCard(userId, this);
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: findOrGenerateCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
     }
 }
