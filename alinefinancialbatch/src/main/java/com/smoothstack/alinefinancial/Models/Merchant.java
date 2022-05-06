@@ -1,18 +1,15 @@
 package com.smoothstack.alinefinancial.Models;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
 
 @Getter
 @Setter
-@Entity
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,7 +18,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Merchant {
 
-    @Id
     private String id;
 
     private String name;
@@ -33,4 +29,15 @@ public class Merchant {
     private String zip;
 
     private String mcc;
+
+    private HashMap<String, Integer> transactionsByAmt;
+
+    public void addAmount(String amt) {
+        if(transactionsByAmt.containsKey(amt)) {
+            transactionsByAmt.put(amt, transactionsByAmt.get(amt)+1);
+        }
+        else {
+            transactionsByAmt.put(amt, 1);
+        }
+    }
 }

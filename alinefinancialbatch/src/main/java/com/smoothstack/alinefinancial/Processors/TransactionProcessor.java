@@ -1,6 +1,6 @@
 package com.smoothstack.alinefinancial.Processors;
 
-import com.smoothstack.alinefinancial.Caches.TransactionCache;
+import com.smoothstack.alinefinancial.Maps.TransactionCache;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -11,9 +11,8 @@ public class TransactionProcessor implements ItemProcessor<Transaction, Transact
 
     @Override
     public Transaction process(Transaction item) throws Exception {
-        item.setId(index);
         transactionCache.addTransaction(index, item);
         index++;
-        return null;
+        return item;
     }
 }

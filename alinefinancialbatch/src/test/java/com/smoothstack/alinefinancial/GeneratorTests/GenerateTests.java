@@ -1,9 +1,9 @@
 package com.smoothstack.alinefinancial.GeneratorTests;
 
-import com.smoothstack.alinefinancial.Caches.CardCache;
-import com.smoothstack.alinefinancial.Caches.MerchantCache;
-import com.smoothstack.alinefinancial.Caches.StateCache;
-import com.smoothstack.alinefinancial.Caches.UserCache;
+import com.smoothstack.alinefinancial.Maps.CardMap;
+import com.smoothstack.alinefinancial.Maps.MerchantMap;
+import com.smoothstack.alinefinancial.Maps.StateMap;
+import com.smoothstack.alinefinancial.Maps.UserMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import com.smoothstack.alinefinancial.Models.User;
@@ -22,10 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GenerateTests {
 
-    private final UserCache userCache = UserCache.getInstance();
-    private final CardCache cardCache = CardCache.getInstance();
-    private final MerchantCache merchantCache = MerchantCache.getInstance();
-    private final StateCache stateCache = StateCache.getInstance();
+    private final UserMap userCache = UserMap.getInstance();
+    private final CardMap cardCache = CardMap.getInstance();
+    private final MerchantMap merchantCache = MerchantMap.getInstance();
+    private final StateMap stateCache = StateMap.getInstance();
 
     @Test
     public void correctUserGenerationTest(){
@@ -57,9 +57,9 @@ public class GenerateTests {
         t.setMerchant_zip("32603");
         t.setMcc("1234");
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
-        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc()).getClass(), Merchant.class);
+        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc(), t.getAmount()).getClass(), Merchant.class);
         assertEquals(1, merchantCache.getGeneratedMerchants().size());
-        Merchant merchant = merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc());
+        Merchant merchant = merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc(), t.getAmount());
         assertEquals(merchant.getName(), merchantCache.getGeneratedMerchants().get(t.getMerchant_name()).getName());
         merchantCache.getGeneratedMerchants().remove(t.getMerchant_name());
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
@@ -76,7 +76,7 @@ public class GenerateTests {
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
         assertTrue(stateCache.getSeenStates().isEmpty());
         stateCache.addSeenStatesAndZip(t);
-        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc()).getClass(), Merchant.class);
+        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc(), t.getAmount()).getClass(), Merchant.class);
         assertEquals(1, merchantCache.getGeneratedMerchants().size());
         assertEquals(1, stateCache.getSeenStates().size());
         stateCache.getSeenStates().remove(t.getMerchant_state());

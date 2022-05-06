@@ -1,9 +1,8 @@
-package com.smoothstack.alinefinancial.Caches;
+package com.smoothstack.alinefinancial.Maps;
 
 import com.smoothstack.alinefinancial.Models.Transaction;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class TransactionCache {
     HashMap<Long, Transaction> transactionMap = new HashMap<Long, Transaction>();

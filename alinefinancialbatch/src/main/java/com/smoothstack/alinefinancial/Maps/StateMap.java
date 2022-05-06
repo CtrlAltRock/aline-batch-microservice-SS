@@ -1,18 +1,13 @@
-package com.smoothstack.alinefinancial.Caches;
+package com.smoothstack.alinefinancial.Maps;
 
 import com.smoothstack.alinefinancial.Models.State;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static java.util.Map.entry;
 
-@Component
 @Slf4j(topic="StateCache")
-public class StateCache {
+public class StateMap {
 
     Map<String, State> stateCache = Map.ofEntries(
             entry( "AL", new State("Alabama", "AL", "Montgomery", new ArrayList<String>())),
@@ -66,21 +61,16 @@ public class StateCache {
             entry("WI", new State("Wisconsin", "WI", "Madison", new ArrayList<String>())),
             entry("WY", new State("Wyoming", "WY", "Cheyenne", new ArrayList<String>())),
             entry("D.C.", new State("Washington D.C.", "D.C.", "Washington D.C.", new ArrayList<String>()))
-            //entry("ONLINE", new State("ONLINE", "", "", new ArrayList<String>()))
 
     );
 
     private final HashMap<String, State> seenStates = new HashMap<String, State>();
 
-    private static StateCache stateCacheInstance = null;
+    private static StateMap stateCacheInstance = null;
 
-    public static StateCache getInstance() {
+    public static StateMap getInstance() {
         if(stateCacheInstance == null) {
-            synchronized (StateCache.class) {
-                if (stateCacheInstance == null) {
-                    stateCacheInstance = new StateCache();
-                }
-            }
+            stateCacheInstance = new StateMap();
         }
         return stateCacheInstance;
     }
@@ -91,7 +81,7 @@ public class StateCache {
 
     public State addSeenStatesAndZip(Transaction item) {
         State state = null;
-        // Not a state that exists could be a country since product owner doesn't know that countries are in transaction file
+
         if (item.getMerchant_state() != null && stateCache.get(item.getMerchant_state()) == null && !item.getMerchant_city().equals("ONLINE")) {
             State newCountry = new State(item.getMerchant_state(), "unknown", "unknown", new ArrayList<String>());
             if (item.getMerchant_zip() != null) {
@@ -100,6 +90,7 @@ public class StateCache {
             getInstance().seenStates.put(item.getMerchant_state(), newCountry);
         } else if (!item.getMerchant_city().equals("ONLINE")) {
             if (getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
+
                 if (getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
                     getInstance().getSeenStates().get(item.getMerchant_state()).setZipCodes(new ArrayList<String>());
                 }
@@ -107,6 +98,7 @@ public class StateCache {
                     getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
                     state = getInstance().getSeenStates().get(item.getMerchant_state());
                 }
+
             } else {
                 getInstance().getSeenStates().put(item.getMerchant_state(), stateCache.get(item.getMerchant_state()));
                 getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());

@@ -1,6 +1,6 @@
 package com.smoothstack.alinefinancial.Generators;
 
-import com.smoothstack.alinefinancial.Caches.CardCache;
+import com.smoothstack.alinefinancial.Maps.CardMap;
 import com.smoothstack.alinefinancial.Models.Card;
 import com.vangogiel.luhnalgorithms.LuhnAlgorithms;
 
@@ -21,11 +21,11 @@ public class CardGenerator {
             }
         return cardGeneratorInstance;
     }
-    public void instantiateCard(Long userId, CardCache cardCache) {
+    public void instantiateCard(Long userId, CardMap cardCache) {
         cardCache.getGeneratedCards().put(userId, new HashSet<>());
     }
 
-    public void addGeneratedCard(Long userId, CardCache cc){
+    public void addGeneratedCard(Long userId, CardMap cc){
         cc.addGeneratedCard(userId, makeCard(userId));
     }
 

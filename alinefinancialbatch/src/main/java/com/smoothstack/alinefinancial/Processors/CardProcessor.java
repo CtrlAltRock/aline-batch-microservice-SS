@@ -1,25 +1,29 @@
 package com.smoothstack.alinefinancial.Processors;
 
-import com.smoothstack.alinefinancial.Caches.CardCache;
-import com.smoothstack.alinefinancial.Models.Card;
+import com.smoothstack.alinefinancial.Maps.CardMap;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j(topic = "CardProcessor")
-public class CardProcessor extends ItemListenerSupport<Transaction, Object> implements ItemProcessor<Transaction, Object> {
+public class CardProcessor implements ItemProcessor<Transaction, Transaction> {
 
-    private final CardCache cardCache = CardCache.getInstance();
+    private final CardMap cardCache = CardMap.getInstance();
+    private Long transactionLine = 1L;
 
     @Override
     public Transaction process(Transaction item) {
         try {
             cardCache.findOrGenerateCard(item.getUser(), item.getCard());
+            transactionLine++;
         } catch (Exception e) {
-            log.info(e.toString());
+            StringBuilder errorString = new StringBuilder();
+            errorString.append(e);
+            errorString.append(" on ");
+            errorString.append(transactionLine);
+
+            log.info(errorString.toString());
         }
-        return null;
+        return item;
     }
 }

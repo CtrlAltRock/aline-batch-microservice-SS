@@ -1,7 +1,7 @@
 package com.smoothstack.alinefinancial.Generators;
 
 import com.github.javafaker.Faker;
-import com.smoothstack.alinefinancial.Caches.UserCache;
+import com.smoothstack.alinefinancial.Maps.UserMap;
 import com.smoothstack.alinefinancial.Models.User;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class UserGenerator {
         return userGeneratorInstance;
     }
 
-    public User generateUser(Long userId, UserCache uc) {
+    public User generateUser(Long userId, UserMap uc) {
         String firstName = faker.name().firstName();
         String lastName = faker.name().lastName();
 
@@ -35,6 +35,8 @@ public class UserGenerator {
         user.setLastName(lastName);
         user.setEmail(firstName + "." + lastName + "@smoothceeplusplus.com");
         user.setCards(new ArrayList<>());
+        user.setInsufficientBalanceTransactions(0L);
+        user.setDeposits(new ArrayList<>());
         uc.addGeneratedUser(userId, user);
 
         return user;
