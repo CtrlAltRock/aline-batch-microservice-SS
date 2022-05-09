@@ -30,9 +30,6 @@ public class User {
 
     private Long insufficientBalanceTransactions;
 
-    //Not using this for now, may end up using later for analysis
-    //private List<Transaction> transactions;
-
     private List<Transaction> deposit;
 
     public synchronized void setCard(Card card){

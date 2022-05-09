@@ -41,10 +41,10 @@ public class BatchConfig {
     JobBuilderFactory jobsFactory;
 
     @Bean
-    public Job allJobs() throws Exception {
+    public Job theOnlyJob() throws Exception {
         return jobsFactory.get("allJobs")
                 .incrementer(new RunIdIncrementer())
-                .start(splitFlow())
+                .start(theFlow())
                 .end()
                 .build();
     }
@@ -61,13 +61,17 @@ public class BatchConfig {
 
 
     @Bean
-    public Flow splitFlow() throws Exception {
+    public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
                 .from(theBigStep()).on("FAILED").to(failureFlow())
                 .from(theBigStep()).on("COMPLETED").to(xmlWriterFlow())
-                .next(analysisFlow())
-                .next(reportFlow())
+                .from(xmlWriterFlow()).on("FAILED").to(failureFlow())
+                .from(xmlWriterFlow()).on("COMPLETED").to(analysisFlow())
+                .from(analysisFlow()).on("FAILED").to(failureFlow())
+                .from(analysisFlow()).on("COMPLETED").to(reportFlow())
+                .from(reportFlow()).on("FAILED").to(failureFlow())
+                .from(reportFlow()).on("COMPLETED").stop()
                 .build();
     }
 
@@ -92,9 +96,6 @@ public class BatchConfig {
                 .name("csvReader")
                 .saveState(false)
                 .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/test2.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/recurringMerchantTestFile.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/badFormatFile.csv"))
                 .linesToSkip(1)
                 .delimited()
                 .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
@@ -122,7 +123,7 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlCardFlow")
                 .split(taskExecutor())
-                .add(xmlCardFlow(), xmlMerchantFlow(), xmlStateFlow(), xmlUserFlow(), xmlDepositsFlow())
+                .add(xmlCardFlow(), xmlMerchantFlow(), xmlStateFlow(), xmlUserFlow(), xmlDepositsFlow(), xmlTransOver100AndAfter8PMFlow())
                 .build();
     }
 
@@ -158,6 +159,13 @@ public class BatchConfig {
     public Flow xmlDepositsFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlDepositsFlow")
                 .start(xmlDepositsWriterStep())
+                .build();
+    }
+
+    @Bean
+    public Flow xmlTransOver100AndAfter8PMFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("xmlTransOver100AndAfter8PMFlow")
+                .start(xmlTransOver100AndAfter8PMStep())
                 .build();
     }
 
@@ -237,6 +245,13 @@ public class BatchConfig {
     public Step xmlDepositsWriterStep() {
         return stepsFactory.get("xmlDepositsWriterStep")
                 .tasklet(new XmlDepositsWriterTasklet())
+                .build();
+    }
+
+    @Bean
+    public Step xmlTransOver100AndAfter8PMStep() {
+        return stepsFactory.get("xmlTransOver100AndAfter8PM")
+                .tasklet(new XmlTransAfter8And100())
                 .build();
     }
 

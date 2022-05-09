@@ -25,8 +25,10 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
     @Override
     public Transaction process(Transaction item) throws Exception {
         try {
+
             User user = userMap.findUserOrGenerate(item.getUser());
             cardMap.findOrGenerateCard(item.getUser(), item.getCard());
+
             if(!item.getErrors().equals("")) {
                 List<String> errors = Arrays.asList(item.getErrors().split(","));
                 if(errors.contains("Insufficient Balance")) {
