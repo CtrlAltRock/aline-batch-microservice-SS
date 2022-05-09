@@ -5,8 +5,8 @@ There are many tools to use when designing and developing applications for proce
 
 ### Table of Contents
 * [Installation](#installation)
-* [Files to Process](#Transactions in a .csv)
-* [Usage](#Usage)
+* [Transactions](#transactions)
+* [Usage](#usage)
 * [Credits](#credits)
 * [License](#license)
 
@@ -14,7 +14,7 @@ There are many tools to use when designing and developing applications for proce
 1. Clone the repository
 2. Modify the application by adding your transaction records as a .csv
 
-### Transactions in a .csv file
+### Transactions
 * Your .csv file of transactions should include a header of the records columns
   * This header should use 
 
