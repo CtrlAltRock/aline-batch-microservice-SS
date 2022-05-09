@@ -8,21 +8,22 @@ import org.springframework.batch.item.ItemProcessor;
 @Slf4j(topic = "StateProcessor")
 public class StateProcessor implements ItemProcessor<Transaction, Transaction> {
 
-    private static StateMap stateCache = new StateMap();
+    private static StateMap stateMap = new StateMap();
     private Long transactionLine = 1L;
 
     @Override
     public Transaction process(Transaction item) throws Exception {
         try {
-            stateCache.addSeenStatesAndZip(item);
+            stateMap.addSeenStatesAndZip(item);
             transactionLine++;
         } catch (Exception e) {
             StringBuilder errorString = new StringBuilder();
             errorString.append(e);
-            errorString.append(" on ");
+            errorString.append(" on transaction line: ");
             errorString.append(transactionLine);
 
-            log.info(errorString.toString());
+            log.error(item.toString());
+            log.error(errorString.toString());
         }
         return item;
     }

@@ -18,7 +18,7 @@ import java.util.HashMap;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Merchant {
 
-    private String id;
+    private Long id;
 
     private String name;
 
@@ -30,14 +30,20 @@ public class Merchant {
 
     private String mcc;
 
-    private HashMap<String, Integer> transactionsByAmt;
+    private HashMap<Double, Integer> transactionsByAmt;
 
-    public void addAmount(String amt) {
-        if(transactionsByAmt.containsKey(amt)) {
-            transactionsByAmt.put(amt, transactionsByAmt.get(amt)+1);
-        }
-        else {
-            transactionsByAmt.put(amt, 1);
+    public void addAmount(Double amt) {
+        try {
+            if (transactionsByAmt.containsKey(amt)) {
+                transactionsByAmt.put(amt, transactionsByAmt.get(amt) + 1);
+            } else {
+                transactionsByAmt.put(amt, 1);
+            }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addAmount\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
     }
 }

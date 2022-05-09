@@ -19,7 +19,7 @@ public class XmlStateWriterTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
             XStream statesXStream = new XStream();
-            statesXStream.alias("state", State.class);
+            statesXStream.alias("State", State.class);
             FileWriter statesFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlStates.xml");
             StringBuilder statesStringBuilder = new StringBuilder();
             statesStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -31,7 +31,7 @@ public class XmlStateWriterTasklet implements Tasklet {
             statesFileWriter.append(statesStringBuilder);
             statesFileWriter.close();
         } catch (Exception e) {
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }

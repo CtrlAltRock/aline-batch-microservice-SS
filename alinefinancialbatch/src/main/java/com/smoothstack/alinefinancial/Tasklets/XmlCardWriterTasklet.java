@@ -20,7 +20,7 @@ public class XmlCardWriterTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
             XStream cardXStream = new XStream();
-            cardXStream.alias("card", Card.class);
+            cardXStream.alias("Card", Card.class);
             FileWriter cardFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlCards.xml");
             StringBuilder cardStringBuilder = new StringBuilder();
             cardStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -34,7 +34,7 @@ public class XmlCardWriterTasklet implements Tasklet {
             cardFileWriter.append(cardStringBuilder);
             cardFileWriter.close();
         } catch (Exception e) {
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }

@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import static java.util.Map.entry;
 
-@Slf4j(topic="StateCache")
+@Slf4j(topic="StateMap")
 public class StateMap {
 
-    Map<String, State> stateCache = Map.ofEntries(
+    Map<String, State> stateMap = Map.ofEntries(
             entry( "AL", new State("Alabama", "AL", "Montgomery", new ArrayList<String>())),
             entry("AK", new State("Alaska", "AK", "Juneau", new ArrayList<String>())),
             entry("AZ", new State("Arizona", "AZ", "Phoenix", new ArrayList<String>())),
@@ -66,44 +66,50 @@ public class StateMap {
 
     private final HashMap<String, State> seenStates = new HashMap<String, State>();
 
-    private static StateMap stateCacheInstance = null;
+    private static StateMap stateMapInstance = null;
 
     public static StateMap getInstance() {
-        if(stateCacheInstance == null) {
-            stateCacheInstance = new StateMap();
+        if(stateMapInstance == null) {
+            stateMapInstance = new StateMap();
         }
-        return stateCacheInstance;
+        return stateMapInstance;
     }
 
-    public HashMap<String, State> getSeenStates() {
+    public synchronized HashMap<String, State> getSeenStates() {
         return getInstance().seenStates;
     }
 
-    public State addSeenStatesAndZip(Transaction item) {
+    public synchronized State addSeenStatesAndZip(Transaction item) {
         State state = null;
-
-        if (item.getMerchant_state() != null && stateCache.get(item.getMerchant_state()) == null && !item.getMerchant_city().equals("ONLINE")) {
-            State newCountry = new State(item.getMerchant_state(), "unknown", "unknown", new ArrayList<String>());
-            if (item.getMerchant_zip() != null) {
-                newCountry.addZipCodes(item.getMerchant_zip());
-            }
-            getInstance().seenStates.put(item.getMerchant_state(), newCountry);
-        } else if (!item.getMerchant_city().equals("ONLINE")) {
-            if (getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
-
-                if (getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
-                    getInstance().getSeenStates().get(item.getMerchant_state()).setZipCodes(new ArrayList<String>());
+        try {
+            if (item.getMerchant_state() != null && stateMap.get(item.getMerchant_state()) == null && !item.getMerchant_city().equals("ONLINE")) {
+                State newCountry = new State(item.getMerchant_state(), "unknown", "unknown", new ArrayList<String>());
+                if (item.getMerchant_zip() != null) {
+                    newCountry.addZipCodes(item.getMerchant_zip());
                 }
-                if (!getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().contains(item.getMerchant_zip())) {
+                getInstance().seenStates.put(item.getMerchant_state(), newCountry);
+            } else if (!item.getMerchant_city().equals("ONLINE")) {
+                if (getInstance().getSeenStates().containsKey(item.getMerchant_state())) {
+
+                    if (getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().equals(null)) {
+                        getInstance().getSeenStates().get(item.getMerchant_state()).setZipCodes(new ArrayList<String>());
+                    }
+                    if (!getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().contains(item.getMerchant_zip())) {
+                        getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
+                        state = getInstance().getSeenStates().get(item.getMerchant_state());
+                    }
+
+                } else {
+                    getInstance().getSeenStates().put(item.getMerchant_state(), stateMap.get(item.getMerchant_state()));
                     getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
                     state = getInstance().getSeenStates().get(item.getMerchant_state());
                 }
-
-            } else {
-                getInstance().getSeenStates().put(item.getMerchant_state(), stateCache.get(item.getMerchant_state()));
-                getInstance().getSeenStates().get(item.getMerchant_state()).getZipCodes().add(item.getMerchant_zip());
-                state = getInstance().getSeenStates().get(item.getMerchant_state());
             }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addSeenStatesAndZip\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
         }
         return state;
     }

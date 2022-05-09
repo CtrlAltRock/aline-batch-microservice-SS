@@ -3,9 +3,11 @@ package com.smoothstack.alinefinancial.Generators;
 import com.smoothstack.alinefinancial.Maps.CardMap;
 import com.smoothstack.alinefinancial.Models.Card;
 import com.vangogiel.luhnalgorithms.LuhnAlgorithms;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 
+@Slf4j(topic = "CardGenerator")
 public class CardGenerator {
 
     private static CardGenerator cardGeneratorInstance = null;
@@ -13,28 +15,57 @@ public class CardGenerator {
     private Long incrementId = 0L;
 
     public static CardGenerator getInstance(){
-        if(cardGeneratorInstance == null)
-            synchronized (CardGenerator.class) {
-                if (cardGeneratorInstance == null) {
-                    cardGeneratorInstance = new CardGenerator();
+        try {
+            if (cardGeneratorInstance == null)
+                synchronized (CardGenerator.class) {
+                    if (cardGeneratorInstance == null) {
+                        cardGeneratorInstance = new CardGenerator();
+                    }
                 }
-            }
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: getInstance\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
         return cardGeneratorInstance;
     }
+
     public void instantiateCard(Long userId, CardMap cardCache) {
-        cardCache.getGeneratedCards().put(userId, new HashSet<>());
+        try {
+            cardCache.getGeneratedCards().put(userId, new HashSet<>());
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: instantiateCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 
-    public void addGeneratedCard(Long userId, CardMap cc){
-        cc.addGeneratedCard(userId, makeCard(userId));
+    public synchronized void addGeneratedCard(Long userId, CardMap cc){
+        try {
+            cc.addGeneratedCard(userId, makeCard(userId));
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: addGeneratedCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
     }
 
-    private Card makeCard(Long userId){
+    private synchronized Card makeCard(Long userId){
         Card card = new Card();
-        card.setId(incrementId);
-        card.setNumber(Long.toString(LuhnAlgorithms.generateRandomLuhn(16)));
-        card.setUserId(userId);
-        incrementId += 1;
+        try {
+            card.setId(incrementId);
+            card.setNumber(Long.toString(LuhnAlgorithms.generateRandomLuhn(16)));
+            card.setUserId(userId);
+            incrementId += 1;
+        } catch (Exception e) {
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Method: makeCard\tException: ");
+            errorMessage.append(e);
+            log.error(errorMessage.toString());
+        }
         return card;
     }
 

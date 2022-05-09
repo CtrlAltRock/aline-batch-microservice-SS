@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j(topic = "Card")
-@XmlRootElement(name="card")
+@XmlRootElement(name="Card")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Card {
 

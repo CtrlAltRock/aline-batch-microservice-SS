@@ -41,10 +41,10 @@ public class BatchConfig {
     JobBuilderFactory jobsFactory;
 
     @Bean
-    public Job allJobs() throws Exception {
+    public Job theOnlyJob() throws Exception {
         return jobsFactory.get("allJobs")
                 .incrementer(new RunIdIncrementer())
-                .start(splitFlow())
+                .start(theFlow())
                 .end()
                 .build();
     }
@@ -61,23 +61,22 @@ public class BatchConfig {
 
 
     @Bean
-    public Flow splitFlow() throws Exception {
+    public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
                 .from(theBigStep()).on("FAILED").to(failureFlow())
                 .from(theBigStep()).on("COMPLETED").to(xmlWriterFlow())
-                .next(analysisFlow())
-                .next(reportFlow())
+                .from(xmlWriterFlow()).on("FAILED").to(failureFlow())
+                .from(xmlWriterFlow()).on("COMPLETED").to(analysisFlow())
+                .from(analysisFlow()).on("FAILED").to(failureFlow())
+                .from(analysisFlow()).on("COMPLETED").to(reportFlow())
+                .from(reportFlow()).on("FAILED").to(failureFlow())
+                .from(reportFlow()).on("COMPLETED").stop()
                 .build();
     }
 
     @Bean
     public Step theBigStep() throws Exception {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(512);
-        taskExecutor.setMaxPoolSize(1024);
-        taskExecutor.afterPropertiesSet();
-
         return stepsFactory.get("theBigStep")
                 .<Transaction, Transaction>chunk(50000)
                 .reader(csvReader())
@@ -87,7 +86,22 @@ public class BatchConfig {
                 .skipPolicy(new CustomSkipPolicy())
                 .retryLimit(1)
                 .retry(Exception.class)
-                .taskExecutor(taskExecutor)
+                .taskExecutor(taskExecutor())
+                .build();
+    }
+
+    @Bean
+    public FlatFileItemReader<Transaction> csvReader() {
+        return new FlatFileItemReaderBuilder<Transaction>()
+                .name("csvReader")
+                .saveState(false)
+                .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
+                .linesToSkip(1)
+                .delimited()
+                .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<Transaction>() {{
+                    setTargetType(Transaction.class);
+                }})
                 .build();
     }
 
@@ -109,7 +123,7 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlCardFlow")
                 .split(taskExecutor())
-                .add(xmlCardFlow(), xmlMerchantFlow(), xmlStateFlow(), xmlUserFlow(), xmlDepositsFlow())
+                .add(xmlCardFlow(), xmlMerchantFlow(), xmlStateFlow(), xmlUserFlow(), xmlDepositsFlow(), xmlTransOver100AndAfter8PMFlow())
                 .build();
     }
 
@@ -149,6 +163,13 @@ public class BatchConfig {
     }
 
     @Bean
+    public Flow xmlTransOver100AndAfter8PMFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("xmlTransOver100AndAfter8PMFlow")
+                .start(xmlTransOver100AndAfter8PMStep())
+                .build();
+    }
+
+    @Bean
     public Flow analysisFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("analysisFlow")
                 .start(analysisStep())
@@ -170,11 +191,27 @@ public class BatchConfig {
     }
 
     @Bean
+    public Step analysisStep() throws Exception {
+        return stepsFactory.get("analysisTaskletStep")
+                .tasklet(new AnalysisTasklet())
+                .build();
+    }
+
+    @Bean
+    public Step reportStep() throws Exception {
+        return stepsFactory.get("reportTaskletStep")
+                .tasklet(new ReportTasklet())
+                .build();
+    }
+
+    @Bean
     public Step chunkFailureStep() throws Exception {
         return stepsFactory.get("chunkFailureStep")
                 .tasklet(new FailureTasklet())
                 .build();
     }
+
+    // Writer Steps
 
     @Bean
     public Step xmlStateWriterStep() {
@@ -212,32 +249,11 @@ public class BatchConfig {
     }
 
     @Bean
-    public Step analysisStep() throws Exception {
-        return stepsFactory.get("analysisTaskletStep")
-                .tasklet(new AnalysisTasklet())
+    public Step xmlTransOver100AndAfter8PMStep() {
+        return stepsFactory.get("xmlTransOver100AndAfter8PM")
+                .tasklet(new XmlTransAfter8And100())
                 .build();
     }
 
-    @Bean
-    public Step reportStep() throws Exception {
-        return stepsFactory.get("reportTaskletStep")
-                .tasklet(new ReportTasklet())
-                .build();
-    }
 
-    @Bean
-    public FlatFileItemReader<Transaction> csvReader() {
-        return new FlatFileItemReaderBuilder<Transaction>()
-                .name("csvReader")
-                .saveState(false)
-                .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/test2.csv"))
-                .linesToSkip(1)
-                .delimited()
-                .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
-                .fieldSetMapper(new BeanWrapperFieldSetMapper<Transaction>() {{
-                    setTargetType(Transaction.class);
-                }})
-                .build();
-    }
 }

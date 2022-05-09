@@ -20,7 +20,7 @@ public class XmlMerchantWriterTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
             XStream merchantXStream = new XStream();
-            merchantXStream.alias("merchant", Merchant.class);
+            merchantXStream.alias("Merchant", Merchant.class);
             merchantXStream.omitField(Merchant.class, "transactionsByAmt");
             FileWriter merchantFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlMerchants.xml");
             StringBuilder merchantStringBuilder = new StringBuilder();
@@ -35,7 +35,7 @@ public class XmlMerchantWriterTasklet implements Tasklet {
             merchantFileWriter.close();
 
         } catch (Exception e) {
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }
