@@ -1,9 +1,25 @@
-# aline-batch-microservice-SS
-Spring Batch Aline Microservice for transactions
+# aline-batch-microservice-SS : Built With Spring Batch & Spring Boot
 
-### Preliminary Design Documents
-#### High Level Overview of Data Flow Architecture
-![Sky Level View](DataFlowV2.jpeg)
+### Description
+There are many tools to use when designing and developing applications for processing transaction data, but when it comes to scalability and efficiency I trust Spring Batch. This application is designed to process millions, or even billions of transaction records. Using this application allows for enrichment of de-identified user and card data from records and even allows for analysis on the data. 
 
-#### Intermediary Database Schema for Batch Microservice
-![Intermediary Schema](AlineBatch.JPG)
+### Table of Contents
+* [Installation](#installation)
+* [Files to Process](#Transactions in a .csv)
+* [Usage](#Usage)
+* [Credits](#credits)
+* [License](#license)
+
+### Installation
+1. Clone the repository
+2. Modify the application by adding your transaction records as a .csv
+
+### Transactions in a .csv file
+* Your .csv file of transactions should include a header of the records columns
+  * This header should use 
+
+### Usage
+
+### Credits
+
+### License
