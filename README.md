@@ -17,7 +17,7 @@ There are many tools to use when designing and developing applications for proce
 
 ### Transactions
 * Your .csv file of transactions should include a header of the records columns
-  * This application designed to use a transaction .csv with a header described below. 
+  * This application is designed to use a transaction .csv with a header described below. 
     *  User,Card,Year,Month,Day,Time,Amount,Use Chip,Merchant Name,Merchant City,Merchant State,Zip,MCC,Errors?,Is Fraud?
 
 ### Usage
