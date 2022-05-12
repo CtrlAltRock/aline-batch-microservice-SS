@@ -1,8 +1,8 @@
 package com.smoothstack.alinefinancial.Config;
 
+import com.smoothstack.alinefinancial.Flows.Flows;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import com.smoothstack.alinefinancial.Processors.*;
-import com.smoothstack.alinefinancial.Tasklets.*;
 import com.smoothstack.alinefinancial.Writers.ConsoleItemWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -40,9 +40,12 @@ public class BatchConfig {
     @Autowired
     JobBuilderFactory jobsFactory;
 
+    @Autowired
+    Flows flows;
+
     @Bean
     public Job theOnlyJob() throws Exception {
-        return jobsFactory.get("allJobs")
+        return jobsFactory.get("theOnlyJob")
                 .incrementer(new RunIdIncrementer())
                 .start(theFlow())
                 .end()
@@ -51,9 +54,10 @@ public class BatchConfig {
 
     @Bean
     public TaskExecutor taskExecutor() {
+
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(512);
-        taskExecutor.setMaxPoolSize(1024);
+        taskExecutor.setCorePoolSize(12);
+        taskExecutor.setMaxPoolSize(12);
         taskExecutor.afterPropertiesSet();
         return taskExecutor;
     }
@@ -64,21 +68,22 @@ public class BatchConfig {
     public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
-                .from(theBigStep()).on("FAILED").to(failureFlow())
-                .from(theBigStep()).on("COMPLETED").to(xmlWriterFlow())
-                .from(xmlWriterFlow()).on("FAILED").to(failureFlow())
-                .from(xmlWriterFlow()).on("COMPLETED").to(analysisFlow())
-                .from(analysisFlow()).on("FAILED").to(failureFlow())
-                .from(analysisFlow()).on("COMPLETED").to(reportFlow())
-                .from(reportFlow()).on("FAILED").to(failureFlow())
-                .from(reportFlow()).on("COMPLETED").stop()
+                .from(theBigStep()).on("FAILED").to(flows.failureFlow())
+                .from(theBigStep()).on("COMPLETED").to(flows.analysisFlow())
+                .from(flows.analysisFlow()).on("FAILED").to(flows.failureFlow())
+                .from(flows.analysisFlow()).on("COMPLETED").to(xmlWriterFlow())
+                .from(xmlWriterFlow()).on("FAILED").to(flows.failureFlow())
+                .from(xmlWriterFlow()).on("COMPLETED").to(flows.reportFlow())
+                .from(flows.reportFlow()).on("FAILED").to(flows.failureFlow())
+                .from(flows.reportFlow()).on("COMPLETED").stop()
                 .build();
     }
 
     @Bean
     public Step theBigStep() throws Exception {
+
         return stepsFactory.get("theBigStep")
-                .<Transaction, Transaction>chunk(50000)
+                .<Transaction, Transaction>chunk(20000)
                 .reader(csvReader())
                 .processor(compositeItemProcessor())
                 .writer(new ConsoleItemWriter())
@@ -96,6 +101,7 @@ public class BatchConfig {
                 .name("csvReader")
                 .saveState(false)
                 .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
+                //.resource(new FileSystemResource("src/main/FilesToProcess/recurringMerchantTestFile.csv"))
                 .linesToSkip(1)
                 .delimited()
                 .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
@@ -121,139 +127,12 @@ public class BatchConfig {
 
     @Bean
     public Flow xmlWriterFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlCardFlow")
+        return new FlowBuilder<SimpleFlow>("xmlWriterFlow")
                 .split(taskExecutor())
-                .add(xmlCardFlow(), xmlMerchantFlow(), xmlStateFlow(), xmlUserFlow(), xmlDepositsFlow(), xmlTransOver100AndAfter8PMFlow())
+                .add(flows.xmlCardFlow(), flows.xmlMerchantFlow(), flows.xmlStateFlow(),
+                        flows.xmlUserFlow(), flows.xmlDepositsFlow(), flows.xmlInsufficientBalanceFlow(),
+                        flows.xmlTransOver100AndAfter8PMFlow(), flows.xmlUniqueMerchantsFlow(),
+                        flows.xmlTopFiveRecurringMerchantTransactionsFlow())
                 .build();
     }
-
-    @Bean
-    public Flow xmlCardFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlCardFlow")
-                .start(xmlCardWriterStep())
-                .build();
-    }
-
-    @Bean
-    public Flow xmlMerchantFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlMerchantFlow")
-                .start(xmlMerchantWriterStep())
-                .build();
-    }
-
-    @Bean
-    public Flow xmlUserFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlUserFlow")
-                .start(xmlUserWriterStep())
-                .build();
-    }
-
-    @Bean
-    public Flow xmlStateFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlStateFlow")
-                .start(xmlStateWriterStep())
-                .build();
-    }
-
-    @Bean
-    public Flow xmlDepositsFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlDepositsFlow")
-                .start(xmlDepositsWriterStep())
-                .build();
-    }
-
-    @Bean
-    public Flow xmlTransOver100AndAfter8PMFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlTransOver100AndAfter8PMFlow")
-                .start(xmlTransOver100AndAfter8PMStep())
-                .build();
-    }
-
-    @Bean
-    public Flow analysisFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("analysisFlow")
-                .start(analysisStep())
-                .build();
-    }
-
-    @Bean
-    public Flow reportFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("reportFlow")
-                .start(reportStep())
-                .build();
-    }
-
-    @Bean
-    public Flow failureFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("failureFlow")
-                .start(chunkFailureStep())
-                .build();
-    }
-
-    @Bean
-    public Step analysisStep() throws Exception {
-        return stepsFactory.get("analysisTaskletStep")
-                .tasklet(new AnalysisTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step reportStep() throws Exception {
-        return stepsFactory.get("reportTaskletStep")
-                .tasklet(new ReportTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step chunkFailureStep() throws Exception {
-        return stepsFactory.get("chunkFailureStep")
-                .tasklet(new FailureTasklet())
-                .build();
-    }
-
-    // Writer Steps
-
-    @Bean
-    public Step xmlStateWriterStep() {
-        return stepsFactory.get("xmlStateWriterStep")
-                .tasklet(new XmlStateWriterTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step xmlCardWriterStep() {
-        return stepsFactory.get("xmlCardWriterStep")
-                .tasklet(new XmlCardWriterTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step xmlUserWriterStep() {
-        return stepsFactory.get("xmlUserWriterStep")
-                .tasklet(new XmlUserWriterTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step xmlMerchantWriterStep() {
-        return stepsFactory.get("xmlMerchantWriterStep")
-                .tasklet(new XmlMerchantWriterTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step xmlDepositsWriterStep() {
-        return stepsFactory.get("xmlDepositsWriterStep")
-                .tasklet(new XmlDepositsWriterTasklet())
-                .build();
-    }
-
-    @Bean
-    public Step xmlTransOver100AndAfter8PMStep() {
-        return stepsFactory.get("xmlTransOver100AndAfter8PM")
-                .tasklet(new XmlTransAfter8And100())
-                .build();
-    }
-
-
 }

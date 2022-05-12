@@ -15,7 +15,7 @@ public class ReportTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
-           /* analysis.getReportMap().forEach((k, v) -> {
+            /*analysis.getReportMap().forEach((k, v) -> {
                 log.info(String.format("%s: %s", k, v));
             });*/
         } catch (Exception e) {

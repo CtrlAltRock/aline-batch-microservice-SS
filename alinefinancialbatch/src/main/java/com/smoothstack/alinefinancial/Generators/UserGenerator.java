@@ -41,8 +41,6 @@ public class UserGenerator {
             user.setLastName(lastName);
             user.setEmail(firstName + "." + lastName + "@smoothceeplusplus.com");
             user.setCards(new ArrayList<>());
-            user.setInsufficientBalanceTransactions(0L);
-            user.setDeposit(new ArrayList<>());
             uc.addGeneratedUser(userId, user);
         } catch (Exception e) {
             StringBuilder errorMessage = new StringBuilder();
