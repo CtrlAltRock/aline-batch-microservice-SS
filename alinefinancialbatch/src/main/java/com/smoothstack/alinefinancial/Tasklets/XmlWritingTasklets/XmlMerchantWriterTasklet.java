@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.Tasklets;
+package com.smoothstack.alinefinancial.Tasklets.XmlWritingTasklets;
 
 import com.smoothstack.alinefinancial.Maps.MerchantMap;
 import com.smoothstack.alinefinancial.Models.Merchant;

@@ -1,6 +1,7 @@
-package com.smoothstack.alinefinancial.Tasklets;
+package com.smoothstack.alinefinancial.Tasklets.XmlWritingTasklets;
 
-import com.smoothstack.alinefinancial.Maps.UserMap;
+import com.smoothstack.alinefinancial.DataAnalysisModels.UserDeposit;
+import com.smoothstack.alinefinancial.Maps.AnalysisMap;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import com.smoothstack.alinefinancial.Models.User;
 import com.thoughtworks.xstream.XStream;
@@ -16,12 +17,14 @@ import java.io.FileWriter;
 @Slf4j(topic="XmlDepositWriterTasklet")
 public class XmlDepositsWriterTasklet implements Tasklet {
 
-    private final UserMap userMap = UserMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try{
             XStream depositXStream = new XStream();
-            depositXStream.alias("Deposits", User.class);
+            depositXStream.alias("UserDeposit", UserDeposit.class);
             depositXStream.alias("Transaction", Transaction.class);
             depositXStream.omitField(User.class, "email");
             depositXStream.omitField(User.class, "cards");
@@ -39,12 +42,12 @@ public class XmlDepositsWriterTasklet implements Tasklet {
             FileWriter userDepositsWriter = new FileWriter("src/main/ProcessedOutFiles/XmlUserDeposits.xml");
             StringBuilder depositsBuilder = new StringBuilder();
             depositsBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            depositsBuilder.append("<Users>\n");
+            depositsBuilder.append("<UserDeposits>\n");
 
-            userMap.getGeneratedUsers().forEach( (k, v) -> {
+            analysisMap.getUserDeposit().forEach( (k, v) -> {
                 depositsBuilder.append(depositXStream.toXML(v));
             });
-            depositsBuilder.append("\n</Users>");
+            depositsBuilder.append("\n</UserDeposits>");
             userDepositsWriter.append(depositsBuilder);
             userDepositsWriter.close();
 

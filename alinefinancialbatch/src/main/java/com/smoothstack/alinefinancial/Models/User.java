@@ -28,28 +28,12 @@ public class User {
 
     private List<Card> cards;
 
-    private Long insufficientBalanceTransactions;
-
-    private List<Transaction> deposit;
-
     public synchronized void setCard(Card card){
         try {
             cards.add(card);
         } catch (Exception e) {
             StringBuilder errorMessage = new StringBuilder();
             errorMessage.append("Method: setCard\tException: ");
-            errorMessage.append(e);
-            log.error(errorMessage.toString());
-        }
-    }
-
-
-    public synchronized void addDeposit(Transaction item) {
-        try {
-            deposit.add(item);
-        } catch (Exception e) {
-            StringBuilder errorMessage = new StringBuilder();
-            errorMessage.append("Method: addDeposit\tException: ");
             errorMessage.append(e);
             log.error(errorMessage.toString());
         }

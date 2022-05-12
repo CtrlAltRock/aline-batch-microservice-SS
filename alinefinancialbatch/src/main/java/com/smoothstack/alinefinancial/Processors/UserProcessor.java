@@ -25,21 +25,20 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
     @Override
     public Transaction process(Transaction item) throws Exception {
         try {
-
             User user = userMap.findUserOrGenerate(item.getUser());
             cardMap.findOrGenerateCard(item.getUser(), item.getCard());
 
-            if(!item.getErrors().equals("")) {
+            // NRVNA- 84 & 85 Insufficient Balance incrementer
+            if(!item.getErrors().isBlank()) {
                 List<String> errors = Arrays.asList(item.getErrors().split(","));
                 if(errors.contains("Insufficient Balance")) {
-                    // should never be null since user above is either found or generated
-                    userMap.getGeneratedUsers().get(user.getId()).setInsufficientBalanceTransactions(user.getInsufficientBalanceTransactions()+1);
+                    analysisMap.addToInsufficientBalance(user);
                 }
             }
 
             // NRVNA - 83 - All card payments for a user, assuming a negative amount is a payment
             if(Double.parseDouble(item.getAmount().replace("$", "")) < 0) {
-                userMap.getGeneratedUsers().get(user.getId()).addDeposit(item);
+                analysisMap.addToUserDeposits(user, item);
             }
 
             transactionLine++;

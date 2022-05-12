@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.Tasklets;
+package com.smoothstack.alinefinancial.Tasklets.XmlWritingTasklets;
 
 import com.smoothstack.alinefinancial.Maps.TransactionMap;
 import com.smoothstack.alinefinancial.Models.Transaction;
@@ -23,7 +23,6 @@ public class XmlTransactionWriterTasklet implements Tasklet {
         transactionsStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         transactionsStringBuilder.append("<Transaction>\n");
         transactionMap.getMap().forEach((k, v) -> {
-            System.out.println(v.toString());
             if (v != null) transactionsStringBuilder.append(transactionXStream.toXML(v));
         });
         transactionsStringBuilder.append("\n</Transaction>");

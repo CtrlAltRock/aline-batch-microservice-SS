@@ -48,9 +48,7 @@ class AlinefinancialApplicationTests {
 
 	@Test
 	public void givenReferenceOutput_whenJobExecuted_thenSuccess() throws Exception {
-//		// given
-//		FileSystemResource expectedResult = new FileSystemResource(EXPECTED_OUTPUT);
-//		FileSystemResource actualResult = new FileSystemResource(TEST_OUTPUT);
+
 
 		// when
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -66,9 +64,6 @@ class AlinefinancialApplicationTests {
 	@Test
 	public void givenReferenceOutput_whenStep1Executed_thenSuccess() throws Exception {
 
-		// given
-//		FileSystemResource expectedResult = new FileSystemResource(EXPECTED_OUTPUT);
-//		FileSystemResource actualResult = new FileSystemResource(TEST_OUTPUT);
 
 		// when
 		JobExecution jobExecution = jobLauncherTestUtils.launchStep("transaction step");
