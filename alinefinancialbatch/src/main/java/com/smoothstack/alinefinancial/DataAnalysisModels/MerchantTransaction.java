@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="MerchantTransactions")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Slf4j(topic = "MerchantTransactions")
-public class MerchantTransactions {
+public class MerchantTransaction {
 
     private Merchant merchant;
 

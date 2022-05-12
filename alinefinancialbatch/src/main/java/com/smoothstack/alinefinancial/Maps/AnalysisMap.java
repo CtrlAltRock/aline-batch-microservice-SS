@@ -1,17 +1,14 @@
 package com.smoothstack.alinefinancial.Maps;
 
-import com.smoothstack.alinefinancial.DataAnalysisModels.MerchantTransactions;
 import com.smoothstack.alinefinancial.DataAnalysisModels.UserDeposit;
+import com.smoothstack.alinefinancial.Models.Merchant;
 import com.smoothstack.alinefinancial.Models.Transaction;
 import com.smoothstack.alinefinancial.Models.User;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 
@@ -26,10 +23,9 @@ public class AnalysisMap {
     private final HashMap<String, Long> typesOfTransactions = new HashMap<>();
     private final HashMap<User, Integer> insufficientBalance = new HashMap<>();
     private final HashMap<User, UserDeposit> userDeposits = new HashMap<>();
-    private final HashMap<Double, Integer> transactionsByAmt = new HashMap<>();
     private final HashMap<String, HashMap<Boolean, Long> >  statesNoFraud = new HashMap<>();
     private final HashMap<String, ArrayList<Transaction> > transAfter8Above100 = new HashMap<>();
-    private final HashMap<String, MerchantTransactions> merchantTransactions = new HashMap<>();
+    private final Map<Merchant, HashMap<Double, Integer> > transactionsByAmt = Collections.synchronizedMap(new HashMap<>());
 
     private  List<Double> largestTransactions = new ArrayList<>();
 
@@ -51,6 +47,8 @@ public class AnalysisMap {
     public HashMap<String, Object> getReportMap() {
         return reportMap;
     }
+
+    public Map<Merchant, HashMap<Double, Integer> > getTransactionsByAmtByMerchant() {return transactionsByAmt;}
 
     public HashMap<User, Integer> getInsufficientBalanceMap() {return insufficientBalance;}
 
@@ -74,6 +72,26 @@ public class AnalysisMap {
 
     public List<Double> getLargestTransactions() {return largestTransactions;}
 
+    // NRVNA - 86 Top five recurring transactions group by merchant
+    public synchronized void addMerchantTransaction(Merchant merchant, String amount) {
+        Double amt = Double.parseDouble(amount.replace("$", ""));
+        // haven't seen merchant before
+        if(isNull(transactionsByAmt.get(merchant))) {
+            HashMap<Double, Integer> transactionsByFreq = new HashMap<>();
+            transactionsByFreq.put(amt, 1);
+            transactionsByAmt.put(merchant, transactionsByFreq);
+        } else {
+            // we've seen merchant before, but have we haven't seen this amt yet
+            if(isNull(transactionsByAmt.get(merchant).get(amt))) {
+                transactionsByAmt.get(merchant).put(amt, 1);
+            } else {
+                // we've seen this merchant before and we've seen this amt
+                transactionsByAmt.get(merchant).put(amt, transactionsByAmt.get(merchant).get(amt) + 1);
+            }
+        }
+    }
+
+    // NRVNA - 83 deposits for users
     public synchronized void addToUserDeposits(User user, Transaction transaction) {
         if(isNull(userDeposits.get(user))) {
             List<Transaction> deposits = new ArrayList<Transaction>();
@@ -85,6 +103,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 84 & 85 Insufficient balance for users at least once and more than once
     public synchronized void addToInsufficientBalance(User user) {
         if(isNull(insufficientBalance.get(user))) {
             insufficientBalance.put(user, 1);
@@ -104,7 +123,7 @@ public class AnalysisMap {
     }
 
     public synchronized void addToTransactionsByYear(Integer year) {
-        if (transactionsByYear.get(year) == null) {
+        if (isNull(transactionsByYear.get(year))) {
             transactionsByYear.put(year, 1L);
         } else {
             transactionsByYear.put(year, transactionsByYear.get(year) + 1);
@@ -125,7 +144,7 @@ public class AnalysisMap {
     }
 
     public synchronized void addToTypeFrequencies(String type) {
-        if (typesOfTransactions.get(type) == null) {
+        if (isNull(typesOfTransactions.get(type))) {
             typesOfTransactions.put(type, 1L);
         } else {
             typesOfTransactions.put(type, typesOfTransactions.get(type) + 1);
@@ -134,7 +153,7 @@ public class AnalysisMap {
 
     public synchronized void addCityTransactionFrequencies(String city) {
         if (!city.isBlank()) {
-            if (citiesTotalTransactions.get(city) == null) {
+            if (isNull(citiesTotalTransactions.get(city))) {
                 citiesTotalTransactions.put(city, 1L);
             } else {
                 citiesTotalTransactions.put(city, citiesTotalTransactions.get(city) + 1);
@@ -144,7 +163,7 @@ public class AnalysisMap {
 
     public synchronized void addToZipTotals(String zip) {
         if (!zip.isBlank()) {
-            if (zipTotalTransactions.get(zip) == null) {
+            if (isNull(zipTotalTransactions.get(zip))) {
                 zipTotalTransactions.put(zip, 1L);
             } else {
                 zipTotalTransactions.put(zip, zipTotalTransactions.get(zip) + 1);
@@ -154,12 +173,12 @@ public class AnalysisMap {
 
     public synchronized void addToStatesNoFraud(String state, String fraud) {
         // first time seeing state set up boolean hashmap
-        if(statesNoFraud.get(state) == null) {
+        if(isNull(statesNoFraud.get(state))) {
             statesNoFraud.put(state, new HashMap<>());
 
             if(fraud.equals("Yes")) {
                 //first time seeing fraud in state
-                if(statesNoFraud.get(state).get(true) == null) {
+                if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
                 } else {
                     // seen fraud in state before
@@ -167,7 +186,7 @@ public class AnalysisMap {
                 }
             } else {
                 // first time new state has no fraud
-                if(statesNoFraud.get(state).get(false) == null) {
+                if(isNull(statesNoFraud.get(state).get(false))) {
                     statesNoFraud.get(state).put(false, 1L);
                 } else {
                     // state has not had fraud before
@@ -177,13 +196,13 @@ public class AnalysisMap {
         } else {
 
             if(fraud.equals("Yes")) {
-                if(statesNoFraud.get(state).get(true) == null) {
+                if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
                 } else {
                     statesNoFraud.get(state).put(true, statesNoFraud.get(state).get(true) + 1);
                 }
             } else {
-                if(statesNoFraud.get(state).get(false) == null) {
+                if(isNull(statesNoFraud.get(state).get(false))) {
                     statesNoFraud.get(state).put(false, 1L);
                 } else {
                     statesNoFraud.get(state).put(false, statesNoFraud.get(state).get(false) + 1);
@@ -199,14 +218,14 @@ public class AnalysisMap {
         Integer minutes = time.getMinute();
         if((amt > 100 && hour > 20) || (amt > 100 && hour.equals(20) && minutes > 0)) {
             if(item.getMerchant_city().equals("ONLINE")) {
-                if(transAfter8Above100.get("ONLINE") == null) {
+                if(isNull(transAfter8Above100.get("ONLINE"))) {
                     transAfter8Above100.put("ONLINE", new ArrayList<>());
                     transAfter8Above100.get("ONLINE").add(item);
                 } else {
                     transAfter8Above100.get("ONLINE").add(item);
                 }
             } else {
-                if(transAfter8Above100.get(item.getMerchant_zip()) == null) {
+                if(isNull(transAfter8Above100.get(item.getMerchant_zip()))) {
                     transAfter8Above100.put(item.getMerchant_zip(), new ArrayList<>());
                     transAfter8Above100.get(item.getMerchant_zip()).add(item);
                 } else {
@@ -215,21 +234,6 @@ public class AnalysisMap {
             }
         }
 
-    }
-
-    public synchronized void addAmount(Double amt) {
-        try {
-            if (transactionsByAmt.containsKey(amt)) {
-                transactionsByAmt.put(amt, transactionsByAmt.get(amt) + 1);
-            } else {
-                transactionsByAmt.put(amt, 1);
-            }
-        } catch (Exception e) {
-            StringBuilder errorMessage = new StringBuilder();
-            errorMessage.append("Method: addAmount\tException: ");
-            errorMessage.append(e);
-            log.error(errorMessage.toString());
-        }
     }
 
     public void setStatistic(String statName, Object stat) {

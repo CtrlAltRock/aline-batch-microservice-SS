@@ -19,8 +19,6 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
     private AnalysisMap analysisMap = AnalysisMap.getInstance();
 
     private Long transactionLine = 1L;
-    private Long numberOfUsersWithInsufficientBalance = 0L;
-    private Long numberOfUsersWithInsufficientBalanceMoreThanOnce = 0L;
 
     @Override
     public Transaction process(Transaction item) throws Exception {

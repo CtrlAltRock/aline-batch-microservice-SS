@@ -4,7 +4,6 @@ import com.github.javafaker.Faker;
 import com.smoothstack.alinefinancial.Maps.MerchantMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
 import lombok.extern.slf4j.Slf4j;
-import java.util.HashMap;
 
 @Slf4j(topic = "MerchantGenerator")
 public class MerchantGenerator {
@@ -31,16 +30,13 @@ public class MerchantGenerator {
         return merchantGeneratorInstance;
     }
 
-    public Merchant generateMerchant(Long lineId, String name, String code, String amt, MerchantMap mc) {
+    public Merchant generateMerchant(String name, String code, MerchantMap mc) {
         Merchant merchant = new Merchant();
         try {
             String companyName = faker.company().name();
-            merchant.setId(lineId);
+            merchant.setId(name);
             merchant.setName(companyName);
             merchant.setMcc(code);
-            merchant.setTransactionsByAmt(new HashMap<>());
-            Double amtDouble = Double.parseDouble(amt.replace("$", ""));
-            merchant.addAmount(amtDouble);
             mc.addGeneratedMerchant(name, merchant);
         } catch (Exception e) {
             StringBuilder errorMessage = new StringBuilder();

@@ -57,9 +57,9 @@ public class GenerateTests {
         t.setMerchant_zip("32603");
         t.setMcc("1234");
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
-        assertSame(merchantCache.findMerchantOrGenerate(1L, t.getMerchant_name(), t.getMcc(), t.getAmount()).getClass(), Merchant.class);
+        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc()).getClass(), Merchant.class);
         assertEquals(1, merchantCache.getGeneratedMerchants().size());
-        Merchant merchant = merchantCache.findMerchantOrGenerate(1L, t.getMerchant_name(), t.getMcc(), t.getAmount());
+        Merchant merchant = merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc());
         assertEquals(merchant.getName(), merchantCache.getGeneratedMerchants().get(t.getMerchant_name()).getName());
         merchantCache.getGeneratedMerchants().remove(t.getMerchant_name());
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
@@ -76,7 +76,7 @@ public class GenerateTests {
         assertTrue(merchantCache.getGeneratedMerchants().isEmpty());
         assertTrue(stateCache.getSeenStates().isEmpty());
         stateCache.addSeenStatesAndZip(t);
-        assertSame(merchantCache.findMerchantOrGenerate(1L, t.getMerchant_name(), t.getMcc(), t.getAmount()).getClass(), Merchant.class);
+        assertSame(merchantCache.findMerchantOrGenerate(t.getMerchant_name(), t.getMcc()).getClass(), Merchant.class);
         assertEquals(1, merchantCache.getGeneratedMerchants().size());
         assertEquals(1, stateCache.getSeenStates().size());
         stateCache.getSeenStates().remove(t.getMerchant_state());

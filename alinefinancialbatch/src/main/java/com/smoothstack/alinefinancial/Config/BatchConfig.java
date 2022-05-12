@@ -129,9 +129,14 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlWriterFlow")
                 .split(taskExecutor())
-                .add(flows.xmlCardFlow(), flows.xmlMerchantFlow(), flows.xmlStateFlow(),
-                        flows.xmlUserFlow(), flows.xmlDepositsFlow(), flows.xmlInsufficientBalanceFlow(),
-                        flows.xmlTransOver100AndAfter8PMFlow(), flows.xmlUniqueMerchantsFlow(),
+                .add(flows.xmlCardFlow(),
+                        flows.xmlMerchantFlow(),
+                        flows.xmlStateFlow(),
+                        flows.xmlUserFlow(),
+                        flows.xmlDepositsFlow(),
+                        flows.xmlInsufficientBalanceFlow(),
+                        flows.xmlTransOver100AndAfter8PMFlow(),
+                        flows.xmlUniqueMerchantsFlow(),
                         flows.xmlTopFiveRecurringMerchantTransactionsFlow())
                 .build();
     }

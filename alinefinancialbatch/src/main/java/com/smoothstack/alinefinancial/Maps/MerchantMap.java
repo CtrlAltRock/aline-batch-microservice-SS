@@ -31,18 +31,6 @@ public class MerchantMap {
         }
     }
 
-    public synchronized void findGeneratedMerchantAndAddTransactionAmt(String nameId, String amt) {
-        try {
-            Double amtDouble = Double.parseDouble(amt.replace("$", ""));
-            generatedMerchants.get(nameId).addAmount(amtDouble);
-        } catch (Exception e) {
-            StringBuilder errorMessage = new StringBuilder();
-            errorMessage.append("Method: findGeneratedMerchantAndAddTransactionAmt\tException: ");
-            errorMessage.append(e);
-            log.error(errorMessage.toString());
-        }
-    }
-
     public synchronized Merchant getGeneratedMerchant(String nameId) {
         return generatedMerchants.get(nameId);
     }
@@ -51,12 +39,12 @@ public class MerchantMap {
         return generatedMerchants;
     }
 
-    public Merchant findMerchantOrGenerate(Long lineId, String nameId, String code, String amt) {
+    public Merchant findMerchantOrGenerate(String nameId, String code) {
         try {
             if (getGeneratedMerchant(nameId) == null) {
                 synchronized (MerchantMap.class) {
                     if (getGeneratedMerchant(nameId) == null) {
-                        Merchant merchant = merchantGenerator.generateMerchant(lineId, nameId, code, amt, this);
+                        Merchant merchant = merchantGenerator.generateMerchant(nameId, code, this);
                     }
                 }
             }

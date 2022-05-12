@@ -1,7 +1,7 @@
 package com.smoothstack.alinefinancial.Tasklets.XmlWritingTasklets;
 
-import com.smoothstack.alinefinancial.DataAnalysisModels.MerchantTransactions;
-import com.smoothstack.alinefinancial.Maps.MerchantMap;
+import com.smoothstack.alinefinancial.DataAnalysisModels.MerchantTransaction;
+import com.smoothstack.alinefinancial.Maps.AnalysisMap;
 import com.smoothstack.alinefinancial.Models.Merchant;
 import com.thoughtworks.xstream.XStream;
 import lombok.extern.slf4j.Slf4j;
@@ -18,29 +18,28 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "XmlMerchantTopFiveTransactions")
 public class XmlMerchantTopFiveTransactions implements Tasklet {
 
-    private final MerchantMap merchantMap = MerchantMap.getInstance();
-
+    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try{
             XStream stream = new XStream();
-            stream.alias("MerchantTransaction", MerchantTransactions.class);
+            stream.alias("MerchantTransaction", MerchantTransaction.class);
             stream.omitField(Merchant.class, "transactionsByAmt");
             FileWriter fileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlMerchantsTopFiveRecurringTransactions.xml");
             StringBuilder fileBuilder = new StringBuilder();
             fileBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            fileBuilder.append("<MerchantTransactions>");
+            fileBuilder.append("<MerchantTransactions>\n");
 
             // NRVNA-86 Identify top 5 recurring transactions grouped by merchant
-            merchantMap.getGeneratedMerchants().forEach((k, v) -> {
-                String transactions = v.getTransactionsByAmt().entrySet()
+            analysisMap.getTransactionsByAmtByMerchant().forEach((k, v) -> {
+                String transactions = v.entrySet()
                             .stream()
                             .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                             .filter(n -> n.getValue() > 1)
                             .limit(5)
                             .collect(Collectors.toList()).toString();
 
-                fileBuilder.append(stream.toXML(new MerchantTransactions(v, transactions)));
+                fileBuilder.append(stream.toXML(new MerchantTransaction(k, transactions)));
             });
 
             fileBuilder.append("\n</MerchantTransactions>");
