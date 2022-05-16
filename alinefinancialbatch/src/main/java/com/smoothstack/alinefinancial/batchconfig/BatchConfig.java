@@ -1,11 +1,11 @@
 package com.smoothstack.alinefinancial.batchconfig;
 
+import com.smoothstack.alinefinancial.enums.Job;
 import com.smoothstack.alinefinancial.flows.Flows;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.*;
 import com.smoothstack.alinefinancial.writers.ConsoleItemWriter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -44,7 +44,7 @@ public class BatchConfig {
     Flows flows;
 
     @Bean
-    public Job theOnlyJob() throws Exception {
+    public org.springframework.batch.core.Job theOnlyJob() throws Exception {
         return jobsFactory.get("theOnlyJob")
                 .incrementer(new RunIdIncrementer())
                 .start(theFlow())
@@ -68,14 +68,14 @@ public class BatchConfig {
     public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
-                .from(theBigStep()).on("FAILED").to(flows.failureFlow())
-                .from(theBigStep()).on("COMPLETED").to(flows.analysisFlow())
-                .from(flows.analysisFlow()).on("FAILED").to(flows.failureFlow())
-                .from(flows.analysisFlow()).on("COMPLETED").to(xmlWriterFlow())
-                .from(xmlWriterFlow()).on("FAILED").to(flows.failureFlow())
-                .from(xmlWriterFlow()).on("COMPLETED").to(flows.reportFlow())
-                .from(flows.reportFlow()).on("FAILED").to(flows.failureFlow())
-                .from(flows.reportFlow()).on("COMPLETED").stop()
+                .from(theBigStep()).on(Job.FAILED.toString()).to(flows.failureFlow())
+                .from(theBigStep()).on(Job.COMPLETED.toString()).to(flows.analysisFlow())
+                .from(flows.analysisFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.analysisFlow()).on(Job.COMPLETED.toString()).to(xmlWriterFlow())
+                .from(xmlWriterFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
+                .from(xmlWriterFlow()).on(Job.COMPLETED.toString()).to(flows.reportFlow())
+                .from(flows.reportFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.reportFlow()).on(Job.COMPLETED.toString()).stop()
                 .build();
     }
 

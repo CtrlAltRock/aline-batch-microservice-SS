@@ -2,6 +2,7 @@ package com.smoothstack.alinefinancial.maps;
 
 import com.smoothstack.alinefinancial.analysismodels.UserDeposit;
 import com.smoothstack.alinefinancial.comparators.SortGreatestTransactionByAmount;
+import com.smoothstack.alinefinancial.enums.enums;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
@@ -112,7 +113,7 @@ public class AnalysisMap {
     }
 
     public synchronized void addToFraudByYear(Integer year, String fraud) {
-        if (fraud.equals("Yes")) {
+        if (fraud.equals(enums.YES)) {
             if (isNull(fraudByYear.get(year))) {
                 fraudByYear.put(year, 1L);
             } else {
@@ -134,6 +135,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 88 Top 10 largest transactions
     public synchronized void addToLargestTransactions(Transaction item) {
         if(largestTransactions.size() < 10) {
             largestTransactions.add(item);
@@ -183,7 +185,7 @@ public class AnalysisMap {
         if(isNull(statesNoFraud.get(state))) {
             statesNoFraud.put(state, new HashMap<>());
 
-            if(fraud.equals("Yes")) {
+            if(fraud.equals(enums.YES)) {
                 //first time seeing fraud in state
                 if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
@@ -202,7 +204,7 @@ public class AnalysisMap {
             }
         } else {
 
-            if(fraud.equals("Yes")) {
+            if(fraud.equals(enums.YES)) {
                 if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
                 } else {
@@ -224,12 +226,12 @@ public class AnalysisMap {
         Integer hour = time.getHour();
         Integer minutes = time.getMinute();
         if((amt > 100 && hour > 20) || (amt > 100 && hour.equals(20) && minutes > 0)) {
-            if(item.getMerchant_city().equals("ONLINE")) {
-                if(isNull(transAfter8Above100.get("ONLINE"))) {
-                    transAfter8Above100.put("ONLINE", new ArrayList<>());
-                    transAfter8Above100.get("ONLINE").add(item);
+            if(item.getMerchant_city().equals(enums.ONLINE)) {
+                if(isNull(transAfter8Above100.get(enums.ONLINE))) {
+                    transAfter8Above100.put(enums.ONLINE.toString(), new ArrayList<>());
+                    transAfter8Above100.get(enums.ONLINE).add(item);
                 } else {
-                    transAfter8Above100.get("ONLINE").add(item);
+                    transAfter8Above100.get(enums.ONLINE).add(item);
                 }
             } else {
                 if(isNull(transAfter8Above100.get(item.getMerchant_zip()))) {

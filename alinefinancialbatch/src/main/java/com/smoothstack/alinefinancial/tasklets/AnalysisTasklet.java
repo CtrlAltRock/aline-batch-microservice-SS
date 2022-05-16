@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "AnalysisTasklet")
 public class AnalysisTasklet implements Tasklet {
 
+    // maps for
     private CardMap cardMap = CardMap.getInstance();
     private MerchantMap merchantMap = MerchantMap.getInstance();
     private StateMap stateMap = StateMap.getInstance();
