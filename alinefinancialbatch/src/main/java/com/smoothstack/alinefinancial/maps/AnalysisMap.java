@@ -1,6 +1,7 @@
 package com.smoothstack.alinefinancial.maps;
 
 import com.smoothstack.alinefinancial.analysismodels.UserDeposit;
+import com.smoothstack.alinefinancial.comparators.SortGreatestTransactionByAmount;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
@@ -27,7 +28,6 @@ public class AnalysisMap {
     private final HashMap<String, ArrayList<Transaction> > transAfter8Above100 = new HashMap<>();
     private final Map<Merchant, HashMap<Double, Integer> > transactionsByAmt = Collections.synchronizedMap(new HashMap<>());
     private final List<Transaction> largestTransactions = new ArrayList<>();
-
 
 
     private static AnalysisMap analysisMap = null;
@@ -119,6 +119,11 @@ public class AnalysisMap {
                 fraudByYear.put(year, fraudByYear.get(year) + 1);
             }
         }
+        else {
+            if (isNull(fraudByYear.get(year))) {
+                fraudByYear.put(year, 0L);
+            }
+        }
     }
 
     public synchronized void addToTransactionsByYear(Integer year) {
@@ -132,12 +137,15 @@ public class AnalysisMap {
     public synchronized void addToLargestTransactions(Transaction item) {
         if(largestTransactions.size() < 10) {
             largestTransactions.add(item);
-            Collections.sort(largestTransactions, (o1, o2) -> o2.getAmount().replace("$", "").compareTo(o1.getAmount()));
+            //Collections.sort(largestTransactions, (o1, o2) -> Double.compare(Double.parseDouble(o1.getAmount().replace("$", "")),Double.parseDouble(o2.getAmount().replace("$", ""))));
+            Collections.sort(largestTransactions,new SortGreatestTransactionByAmount());
         } else {
             if (Double.parseDouble(item.getAmount().replace("$", "")) > Double.parseDouble(largestTransactions.get(9).getAmount().replace("$", ""))) {
                 largestTransactions.remove(9);
                 largestTransactions.add(item);
-                Collections.sort(largestTransactions, (o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
+                //Collections.sort(largestTransactions, (o1, o2) -> Double.compare(Double.parseDouble(o1.getAmount().replace("$", "")),Double.parseDouble(o2.getAmount().replace("$", ""))));
+                Collections.sort(largestTransactions, new SortGreatestTransactionByAmount());
+
             }
         }
     }

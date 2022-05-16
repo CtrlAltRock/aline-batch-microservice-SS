@@ -22,13 +22,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class Top10LargestTransactions {
+public class FraudByYearTest {
 
     @Autowired
     private FlatFileItemReader<Transaction> reader;
@@ -41,10 +41,10 @@ public class Top10LargestTransactions {
 
 
     @Test
-    public void testTop10LargestTransactions() throws Exception {
+    public void getTransactionsAndTestInsufficientBalance() throws Exception {
         // given
         ExecutionContext ctx = new ExecutionContext();
-        ctx.put("fileName", "src/test/files/top_10_largest.csv");
+        ctx.put("fileName", "src/test/files/fraud.csv");
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
 
         // when
@@ -59,36 +59,40 @@ public class Top10LargestTransactions {
             return result;
         });
 
-        // size is an int "No" equals method
+        // size is an int no equals method
         assertEquals(transactions.size(), 22);
 
-        // count insufficient balances
-        transactions.forEach((item) -> {
+        transactions.forEach( transaction -> {
             try {
-                analysisProcessor.process(item);
+                analysisProcessor.process(transaction);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        Transaction t1 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$1544.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t2 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t3 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t4 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "Yes");
-        Transaction t5 = new Transaction(3l, 0l, 2002, 9, 1, "06:21", "$121.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t6 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$80.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t7 = new Transaction(2l, 0l, 2002, 9, 1, "06:21", "$80.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t8 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t9 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t10 = new Transaction(2l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
 
+        // run the analysis tasklet
+        analysisTasklet.execute(null, null);
 
-        List<Transaction> testLargestTransactions = Arrays.asList(t1, t2, t3, t4, t5,
-                                                                  t6, t7, t8, t9, t10);
+        // getting fraudulent transactions and total transactions
+        HashMap<Integer, Long> fraudByYearMap = analysisMap.getFraudByYearMap();
+        HashMap<Integer, Long> transactionsByYearMap = analysisMap.getTransactionsByYearMap();
 
-        assertEquals(analysisMap.getLargestTransactions().size(), 10);
+        // there are 11 years in total
+        assertEquals(transactionsByYearMap.size(), 11);
+        assertEquals(fraudByYearMap.size(), 11);
 
-        assertEquals(analysisMap.getLargestTransactions(), testLargestTransactions);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2002"), (1./6.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2003"), (2./3.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2004"), (0./2.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2005"), (0./1.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2006"), (1./2.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2007"), (1./1.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2008"), (0./1.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2009"), (0./2.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2010"), (0./2.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2011"), (1./1.) * 100.00);
+        assertEquals(analysisMap.getReportMap().get("fraud-year-2012"), (1./1.) * 100.00);
 
 
     }
