@@ -1,6 +1,6 @@
 package com.smoothstack.alinefinancial;
 
-import com.smoothstack.alinefinancial.Config.BatchConfig;
+import com.smoothstack.alinefinancial.batchconfig.BatchConfig;
 import org.junit.After;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
