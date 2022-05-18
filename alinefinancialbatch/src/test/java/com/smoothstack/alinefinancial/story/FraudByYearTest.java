@@ -35,13 +35,13 @@ public class FraudByYearTest {
 
     private AnalysisProcessor analysisProcessor = new AnalysisProcessor();
 
-    private AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     private AnalysisTasklet analysisTasklet = new AnalysisTasklet();
 
 
     @Test
-    public void getTransactionsAndTestInsufficientBalance() throws Exception {
+    public void fraudByYearTest() throws Exception {
         // given
         ExecutionContext ctx = new ExecutionContext();
         ctx.put("fileName", "src/test/files/fraud.csv");
@@ -81,6 +81,8 @@ public class FraudByYearTest {
         // there are 11 years in total
         assertEquals(transactionsByYearMap.size(), 11);
         assertEquals(fraudByYearMap.size(), 11);
+        System.out.println(transactionsByYearMap);
+        System.out.println(fraudByYearMap);
 
         assertEquals(analysisMap.getReportMap().get("fraud-year-2002"), (1./6.) * 100.00);
         assertEquals(analysisMap.getReportMap().get("fraud-year-2003"), (2./3.) * 100.00);

@@ -1,6 +1,6 @@
 package com.smoothstack.alinefinancial.story;
 
-import com.smoothstack.alinefinancial.analysismodels.InsufficientBalance;
+import com.smoothstack.alinefinancial.xmlmodels.InsufficientBalance;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.UserProcessor;
@@ -38,7 +38,7 @@ public class InsufficientBalancesTest {
 
         private UserProcessor userProcessor = new UserProcessor();
 
-        private AnalysisMap analysisMap = AnalysisMap.getInstance();
+        private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
         private AnalysisTasklet analysisTasklet = new AnalysisTasklet();
 

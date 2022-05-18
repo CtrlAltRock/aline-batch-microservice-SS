@@ -14,7 +14,6 @@ public class JobListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        System.out.println("after starting the Job - Job Execution Context" + jobExecution.getExecutionContext().toString());
 
     }
 }

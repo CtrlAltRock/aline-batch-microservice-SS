@@ -100,5 +100,19 @@ public class Flows {
                 .build();
     }
 
+    @Bean
+    public Flow xmlTopTenLargestTransactionsFlow() throws Exception {
+        return new FlowBuilder<SimpleFlow>("XmlTopTenLargestTransactionsFlow")
+                .start(steps.xmlTopTenLargestTransactionsStep())
+                .build();
+    }
+
+    @Bean
+    public Flow xmlTypesOfTranasctionsFlow() {
+        return new FlowBuilder<SimpleFlow>("xmlTypesOfTransactionsFlow")
+                .start(steps.xmlTypesOfTransactionsStep())
+                .build();
+    }
+
 
 }

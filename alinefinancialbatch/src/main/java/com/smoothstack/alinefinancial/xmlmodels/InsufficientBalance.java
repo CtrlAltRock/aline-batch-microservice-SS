@@ -1,4 +1,5 @@
-package com.smoothstack.alinefinancial.analysismodels;
+package com.smoothstack.alinefinancial.xmlmodels;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,11 +13,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlRootElement(name="UniqueMerchants")
+@XmlRootElement(name="InsufficientBalance")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Slf4j(topic = "UniqueMerchants")
-public class UniqueMerchants {
+@Slf4j(topic = "InsufficientBalance")
+public class InsufficientBalance {
 
-    private Long totalUniqueMerchants;
+    private Long numberOfUsers;
+
+    private Long atLeastOnce;
+
+    private Long moreThanOnce;
+
+    private Double percentageAtLeastOnce;
+
+    private Double percentageMoreThanOnce;
 
 }

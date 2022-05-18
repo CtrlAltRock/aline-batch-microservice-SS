@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.UserMap;
 import com.smoothstack.alinefinancial.models.User;
 import com.thoughtworks.xstream.XStream;
@@ -25,7 +26,7 @@ public class XmlUserWriterTasklet implements Tasklet {
             userXStream.omitField(User.class, "deposit");
             FileWriter userFile = new FileWriter("src/main/ProcessedOutFiles/XmlUsers.xml");
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            stringBuilder.append(XmlFile.HEADER.toString());
             stringBuilder.append("<Users>\n");
             userMap.getGeneratedUsers().forEach((k, v) -> {
                 stringBuilder.append(userXStream.toXML(v));

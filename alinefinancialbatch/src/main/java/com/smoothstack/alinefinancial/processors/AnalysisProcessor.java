@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemProcessor;
 @Slf4j(topic = "AnalysisProcessor")
 public class AnalysisProcessor implements ItemProcessor<Transaction, Transaction> {
 
-    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     private Long transactionLine = 1L;
 

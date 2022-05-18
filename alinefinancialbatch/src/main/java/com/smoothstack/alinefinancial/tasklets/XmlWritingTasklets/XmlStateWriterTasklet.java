@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.StateMap;
 import com.smoothstack.alinefinancial.models.State;
 import com.thoughtworks.xstream.XStream;
@@ -22,7 +23,7 @@ public class XmlStateWriterTasklet implements Tasklet {
             statesXStream.alias("State", State.class);
             FileWriter statesFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlStates.xml");
             StringBuilder statesStringBuilder = new StringBuilder();
-            statesStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            statesStringBuilder.append(XmlFile.HEADER.toString());
             statesStringBuilder.append("<States>\n");
             stateMap.getInstance().getSeenStates().forEach((k, v) -> {
                 if (v != null) statesStringBuilder.append(statesXStream.toXML(v));

@@ -35,7 +35,7 @@ public class Top10LargestTransactions {
 
     private AnalysisProcessor analysisProcessor = new AnalysisProcessor();
 
-    private AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     private AnalysisTasklet analysisTasklet = new AnalysisTasklet();
 

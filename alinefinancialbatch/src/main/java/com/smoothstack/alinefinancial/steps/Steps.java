@@ -104,4 +104,18 @@ public class Steps {
                 .build();
     }
 
+    @Bean
+    public Step xmlTopTenLargestTransactionsStep() throws Exception {
+        return stepsFactory.get("XmlTopTenLargestTransactionStep")
+                .tasklet(new XmlTopTenLargestTransactionsWriterTasklet())
+                .build();
+    }
+
+    @Bean
+    public Step xmlTypesOfTransactionsStep() {
+        return stepsFactory.get("xmlTypesOfTransactionsStep")
+                .tasklet(new XmlTypesOfTransactions())
+                .build();
+    }
+
 }

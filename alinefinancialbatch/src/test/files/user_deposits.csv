@@ -17,7 +17,7 @@ User,Card,Year,Month,Day,Time,Amount,Use Chip,Merchant Name,Merchant City,Mercha
 2,0,2002,9,1,06:21,$-50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
 3,0,2002,9,1,06:21,$-80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
 3,0,2002,9,1,06:21,$-70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
-3,0,2002,9,1,06:21,$-50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+3,0,2002,9,1,06:21,$-50.09,Swipe Transaction,3527216246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
 3,0,2002,9,1,06:21,$-80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
 3,0,2002,9,1,06:21,$70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
 4,0,2002,9,1,06:21,$50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes

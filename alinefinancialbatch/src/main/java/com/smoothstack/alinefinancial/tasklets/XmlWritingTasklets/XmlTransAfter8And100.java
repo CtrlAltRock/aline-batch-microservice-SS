@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.thoughtworks.xstream.XStream;
@@ -14,7 +15,7 @@ import java.io.FileWriter;
 @Slf4j(topic = "XmlTransAfter8And100")
 public class XmlTransAfter8And100 implements Tasklet {
 
-    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -32,7 +33,7 @@ public class XmlTransAfter8And100 implements Tasklet {
             stream.omitField(Transaction.class, "fraud");
             FileWriter fileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlTransactionsOver100And8PM.xml");
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            stringBuilder.append(XmlFile.HEADER.toString());
 
             analysisMap.getTransAfter8Above100().forEach((k, v) -> {
                 stringBuilder.append(k);

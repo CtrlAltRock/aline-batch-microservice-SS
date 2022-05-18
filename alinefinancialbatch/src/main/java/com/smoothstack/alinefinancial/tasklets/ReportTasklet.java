@@ -10,7 +10,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 @Slf4j(topic = "ReportTasklet")
 public class ReportTasklet implements Tasklet {
 
-    private AnalysisMap analysis = AnalysisMap.getInstance();
+    private AnalysisMap analysis = AnalysisMap.getAnalysisMap();
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {

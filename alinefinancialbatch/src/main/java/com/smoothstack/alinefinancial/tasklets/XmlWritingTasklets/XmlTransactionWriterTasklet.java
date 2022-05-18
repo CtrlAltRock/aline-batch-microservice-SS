@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.TransactionMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.thoughtworks.xstream.XStream;
@@ -20,7 +21,7 @@ public class XmlTransactionWriterTasklet implements Tasklet {
         transactionXStream.alias("Transaction", Transaction.class);
         FileWriter transactionsFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlTransactions.xml");
         StringBuilder transactionsStringBuilder = new StringBuilder();
-        transactionsStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        transactionsStringBuilder.append(XmlFile.HEADER.toString());
         transactionsStringBuilder.append("<Transaction>\n");
         transactionMap.getMap().forEach((k, v) -> {
             if (v != null) transactionsStringBuilder.append(transactionXStream.toXML(v));

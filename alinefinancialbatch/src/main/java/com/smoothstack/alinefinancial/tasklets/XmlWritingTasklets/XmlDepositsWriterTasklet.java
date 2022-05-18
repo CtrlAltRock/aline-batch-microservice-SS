@@ -1,6 +1,7 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
-import com.smoothstack.alinefinancial.analysismodels.UserDeposit;
+import com.smoothstack.alinefinancial.xmlmodels.UserDeposit;
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
@@ -17,7 +18,7 @@ import java.io.FileWriter;
 @Slf4j(topic="XmlDepositWriterTasklet")
 public class XmlDepositsWriterTasklet implements Tasklet {
 
-    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
 
     @Override
@@ -41,7 +42,7 @@ public class XmlDepositsWriterTasklet implements Tasklet {
 
             FileWriter userDepositsWriter = new FileWriter("src/main/ProcessedOutFiles/XmlUserDeposits.xml");
             StringBuilder depositsBuilder = new StringBuilder();
-            depositsBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            depositsBuilder.append(XmlFile.HEADER.toString());
             depositsBuilder.append("<UserDeposits>\n");
 
             analysisMap.getUserDeposit().forEach( (k, v) -> {

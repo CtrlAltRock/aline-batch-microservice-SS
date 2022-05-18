@@ -11,7 +11,7 @@ import org.springframework.batch.item.ItemProcessor;
 public class MerchantProcessor implements ItemProcessor<Transaction, Transaction> {
 
     private MerchantMap merchantMap = MerchantMap.getInstance();
-    private AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
     private Long transactionLine = 1L;
 
     @Override

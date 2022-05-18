@@ -1,8 +1,8 @@
 package com.smoothstack.alinefinancial.maps;
 
-import com.smoothstack.alinefinancial.analysismodels.UserDeposit;
+import com.smoothstack.alinefinancial.xmlmodels.UserDeposit;
 import com.smoothstack.alinefinancial.comparators.SortGreatestTransactionByAmount;
-import com.smoothstack.alinefinancial.enums.enums;
+import com.smoothstack.alinefinancial.enums.Strings;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
@@ -33,7 +33,7 @@ public class AnalysisMap {
 
     private static AnalysisMap analysisMap = null;
 
-    public static AnalysisMap getInstance() {
+    public static AnalysisMap getAnalysisMap() {
         if(analysisMap == null) {
             synchronized (AnalysisMap.class) {
                 if(analysisMap == null) {
@@ -43,7 +43,7 @@ public class AnalysisMap {
         }
         return analysisMap;
     }
-
+    // Map getters
     public HashMap<String, Object> getReportMap() {
         return reportMap;
     }
@@ -113,7 +113,7 @@ public class AnalysisMap {
     }
 
     public synchronized void addToFraudByYear(Integer year, String fraud) {
-        if (fraud.equals(enums.YES)) {
+        if (fraud.equals(Strings.YES.toString())) {
             if (isNull(fraudByYear.get(year))) {
                 fraudByYear.put(year, 1L);
             } else {
@@ -139,13 +139,11 @@ public class AnalysisMap {
     public synchronized void addToLargestTransactions(Transaction item) {
         if(largestTransactions.size() < 10) {
             largestTransactions.add(item);
-            //Collections.sort(largestTransactions, (o1, o2) -> Double.compare(Double.parseDouble(o1.getAmount().replace("$", "")),Double.parseDouble(o2.getAmount().replace("$", ""))));
             Collections.sort(largestTransactions,new SortGreatestTransactionByAmount());
         } else {
-            if (Double.parseDouble(item.getAmount().replace("$", "")) > Double.parseDouble(largestTransactions.get(9).getAmount().replace("$", ""))) {
+            if (new SortGreatestTransactionByAmount().compare(item, largestTransactions.get(9)) > 0) {
                 largestTransactions.remove(9);
                 largestTransactions.add(item);
-                //Collections.sort(largestTransactions, (o1, o2) -> Double.compare(Double.parseDouble(o1.getAmount().replace("$", "")),Double.parseDouble(o2.getAmount().replace("$", ""))));
                 Collections.sort(largestTransactions, new SortGreatestTransactionByAmount());
 
             }
@@ -185,7 +183,7 @@ public class AnalysisMap {
         if(isNull(statesNoFraud.get(state))) {
             statesNoFraud.put(state, new HashMap<>());
 
-            if(fraud.equals(enums.YES)) {
+            if(fraud.equals(Strings.YES.toString())) {
                 //first time seeing fraud in state
                 if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
@@ -204,7 +202,7 @@ public class AnalysisMap {
             }
         } else {
 
-            if(fraud.equals(enums.YES)) {
+            if(fraud.equals(Strings.YES.toString())) {
                 if(isNull(statesNoFraud.get(state).get(true))) {
                     statesNoFraud.get(state).put(true, 1L);
                 } else {
@@ -226,12 +224,12 @@ public class AnalysisMap {
         Integer hour = time.getHour();
         Integer minutes = time.getMinute();
         if((amt > 100 && hour > 20) || (amt > 100 && hour.equals(20) && minutes > 0)) {
-            if(item.getMerchant_city().equals(enums.ONLINE)) {
-                if(isNull(transAfter8Above100.get(enums.ONLINE))) {
-                    transAfter8Above100.put(enums.ONLINE.toString(), new ArrayList<>());
-                    transAfter8Above100.get(enums.ONLINE).add(item);
+            if(item.getMerchant_city().equals(Strings.ONLINE.toString())) {
+                if(isNull(transAfter8Above100.get(Strings.ONLINE.toString()))) {
+                    transAfter8Above100.put(Strings.ONLINE.toString(), new ArrayList<>());
+                    transAfter8Above100.get(Strings.ONLINE.toString()).add(item);
                 } else {
-                    transAfter8Above100.get(enums.ONLINE).add(item);
+                    transAfter8Above100.get(Strings.ONLINE.toString()).add(item);
                 }
             } else {
                 if(isNull(transAfter8Above100.get(item.getMerchant_zip()))) {

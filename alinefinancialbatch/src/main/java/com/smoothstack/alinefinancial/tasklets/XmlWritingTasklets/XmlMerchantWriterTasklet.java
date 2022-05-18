@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.MerchantMap;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.thoughtworks.xstream.XStream;
@@ -24,7 +25,7 @@ public class XmlMerchantWriterTasklet implements Tasklet {
             merchantXStream.omitField(Merchant.class, "transactionsByAmt");
             FileWriter merchantFileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlMerchants.xml");
             StringBuilder merchantStringBuilder = new StringBuilder();
-            merchantStringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            merchantStringBuilder.append(XmlFile.HEADER.toString());
             merchantStringBuilder.append("<Merchants>\n");
 
             merchantMap.getGeneratedMerchants().forEach((k, v) -> {

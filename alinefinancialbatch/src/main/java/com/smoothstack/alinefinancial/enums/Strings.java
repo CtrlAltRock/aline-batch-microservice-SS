@@ -1,12 +1,14 @@
 package com.smoothstack.alinefinancial.enums;
 
-public enum Job {
-    COMPLETED("COMPLETED"),
-    FAILED("FAILED");
+public enum Strings {
+    YES("Yes"),
+    NO("No"),
+    ONLINE("ONLINE"),
+    ;
 
     private final String text;
 
-    Job(final String text) {
+    Strings(final String text) {
         this.text = text;
     }
 

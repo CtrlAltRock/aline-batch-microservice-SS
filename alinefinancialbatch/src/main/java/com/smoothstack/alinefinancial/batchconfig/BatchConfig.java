@@ -1,11 +1,12 @@
 package com.smoothstack.alinefinancial.batchconfig;
 
-import com.smoothstack.alinefinancial.enums.Job;
+import com.smoothstack.alinefinancial.enums.JobStatus;
 import com.smoothstack.alinefinancial.flows.Flows;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.*;
 import com.smoothstack.alinefinancial.writers.ConsoleItemWriter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -20,6 +21,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -35,16 +37,19 @@ import java.util.List;
 public class BatchConfig {
 
     @Autowired
-    StepBuilderFactory stepsFactory;
+    private StepBuilderFactory stepsFactory;
 
     @Autowired
-    JobBuilderFactory jobsFactory;
+    private JobBuilderFactory jobsFactory;
 
     @Autowired
-    Flows flows;
+    private Flows flows;
+
+    @Value("${inFile}")
+    private String filename;
 
     @Bean
-    public org.springframework.batch.core.Job theOnlyJob() throws Exception {
+    public Job theOnlyJob() throws Exception {
         return jobsFactory.get("theOnlyJob")
                 .incrementer(new RunIdIncrementer())
                 .start(theFlow())
@@ -68,14 +73,14 @@ public class BatchConfig {
     public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
-                .from(theBigStep()).on(Job.FAILED.toString()).to(flows.failureFlow())
-                .from(theBigStep()).on(Job.COMPLETED.toString()).to(flows.analysisFlow())
-                .from(flows.analysisFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
-                .from(flows.analysisFlow()).on(Job.COMPLETED.toString()).to(xmlWriterFlow())
-                .from(xmlWriterFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
-                .from(xmlWriterFlow()).on(Job.COMPLETED.toString()).to(flows.reportFlow())
-                .from(flows.reportFlow()).on(Job.FAILED.toString()).to(flows.failureFlow())
-                .from(flows.reportFlow()).on(Job.COMPLETED.toString()).stop()
+                .from(theBigStep()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(theBigStep()).on(JobStatus.COMPLETED.toString()).to(flows.analysisFlow())
+                .from(flows.analysisFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.analysisFlow()).on(JobStatus.COMPLETED.toString()).to(xmlWriterFlow())
+                .from(xmlWriterFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(xmlWriterFlow()).on(JobStatus.COMPLETED.toString()).to(flows.reportFlow())
+                .from(flows.reportFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.reportFlow()).on(JobStatus.COMPLETED.toString()).stop()
                 .build();
     }
 
@@ -100,8 +105,7 @@ public class BatchConfig {
         return new FlatFileItemReaderBuilder<Transaction>()
                 .name("csvReader")
                 .saveState(false)
-                .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/recurringMerchantTestFile.csv"))
+                .resource(new FileSystemResource(filename))
                 .linesToSkip(1)
                 .delimited()
                 .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
@@ -129,7 +133,7 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlWriterFlow")
                 .split(taskExecutor())
-                .add(flows.xmlCardFlow(),
+                .add(   flows.xmlCardFlow(),
                         flows.xmlMerchantFlow(),
                         flows.xmlStateFlow(),
                         flows.xmlUserFlow(),
@@ -137,7 +141,9 @@ public class BatchConfig {
                         flows.xmlInsufficientBalanceFlow(),
                         flows.xmlTransOver100AndAfter8PMFlow(),
                         flows.xmlUniqueMerchantsFlow(),
-                        flows.xmlTopFiveRecurringMerchantTransactionsFlow())
+                        flows.xmlTopFiveRecurringMerchantTransactionsFlow(),
+                        flows.xmlTopTenLargestTransactionsFlow(),
+                        flows.xmlTypesOfTranasctionsFlow())
                 .build();
     }
 }

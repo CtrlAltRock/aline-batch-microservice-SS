@@ -1,10 +1,10 @@
 package com.smoothstack.alinefinancial.story;
 
-
-import com.smoothstack.alinefinancial.xmlmodels.UserDeposit;
+import com.smoothstack.alinefinancial.enums.TransactionType;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
-import com.smoothstack.alinefinancial.processors.UserProcessor;
+import com.smoothstack.alinefinancial.processors.AnalysisProcessor;
+import com.smoothstack.alinefinancial.tasklets.AnalysisTasklet;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -29,20 +29,23 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class UserDepositsTest {
+public class TypesOfTransactionsTest {
 
     @Autowired
     private FlatFileItemReader<Transaction> reader;
 
-    private UserProcessor userProcessor = new UserProcessor();
+    private AnalysisProcessor analysisProcessor = new AnalysisProcessor();
 
     private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
+    private AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+
     @Test
-    public void userDepositsTest() throws Exception {
+    public void TypesOfTransactions() throws Exception {
         // given
         ExecutionContext ctx = new ExecutionContext();
-        ctx.put("fileName", "src/test/files/user_deposits.csv");
+        ctx.put("fileName", "src/test/files/types_of_transactions.csv");
         StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
 
         // when
@@ -60,27 +63,28 @@ public class UserDepositsTest {
         // size is an int no equals method
         assertEquals(transactions.size(), 22);
 
-
-        // process 5 users' transactions
-        transactions.forEach((item) -> {
+        transactions.forEach( transaction -> {
             try {
-                userProcessor.process(item);
+                analysisProcessor.process(transaction);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        // getting each user and their deposits
-        HashMap<Long, UserDeposit> userDeposit = analysisMap.getUserDeposit();
-        userDeposit.forEach((k, v) -> {
-            System.out.println(v);
-        });
-        assertEquals(userDeposit.size(), 4);
 
-        assertEquals(userDeposit.get(0L).getDeposits().size(), 2);
-        assertEquals(userDeposit.get(1L).getDeposits().size(), 2);
-        assertEquals(userDeposit.get(2L).getDeposits().size(), 1);
-        assertEquals(userDeposit.get(3L).getDeposits().size(), 4);
+        // run the analysis tasklet
+        analysisTasklet.execute(null, null);
+
+        // getting the types
+        HashMap<String, Long> typesOfTransactions = analysisMap.getTypesOfTransactions();
+
+        assertEquals(Integer.valueOf(typesOfTransactions.size()), 3);
+        assertEquals(typesOfTransactions.get(TransactionType.SWIPE.toString()), 9);
+        assertEquals(typesOfTransactions.get(TransactionType.ONLINE.toString()), 6);
+        assertEquals(typesOfTransactions.get(TransactionType.CHIP.toString()), 7);
+
+
+
     }
 
 
@@ -103,5 +107,4 @@ public class UserDepositsTest {
                     .build();
         }
     }
-
 }

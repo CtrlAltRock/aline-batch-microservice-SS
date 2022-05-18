@@ -17,6 +17,7 @@ public class CustomSkipPolicy implements SkipPolicy {
             skipCount++;
             skipMessage.append("skipCount: ");
             skipMessage.append(skipCount);
+            skipMessage.append("\n");
             log.error(t.toString());
             log.error(skipMessage.toString());
             return true;

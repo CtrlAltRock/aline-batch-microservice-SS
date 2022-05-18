@@ -1,6 +1,7 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
-import com.smoothstack.alinefinancial.analysismodels.MerchantTransaction;
+import com.smoothstack.alinefinancial.xmlmodels.MerchantTransaction;
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.thoughtworks.xstream.XStream;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "XmlMerchantTopFiveTransactions")
 public class XmlMerchantTopFiveTransactions implements Tasklet {
 
-    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try{
@@ -27,7 +28,7 @@ public class XmlMerchantTopFiveTransactions implements Tasklet {
             stream.omitField(Merchant.class, "transactionsByAmt");
             FileWriter fileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlMerchantsTopFiveRecurringTransactions.xml");
             StringBuilder fileBuilder = new StringBuilder();
-            fileBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            fileBuilder.append(XmlFile.HEADER.toString());
             fileBuilder.append("<MerchantTransactions>\n");
 
             // NRVNA-86 Identify top 5 recurring transactions grouped by merchant

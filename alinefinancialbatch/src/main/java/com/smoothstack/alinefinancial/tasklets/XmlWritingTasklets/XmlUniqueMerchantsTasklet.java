@@ -1,7 +1,8 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
 
-import com.smoothstack.alinefinancial.analysismodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.xmlmodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.thoughtworks.xstream.XStream;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.io.FileWriter;
 @Slf4j(topic = "XmlUniqueMerchantsTasklet")
 public class XmlUniqueMerchantsTasklet implements Tasklet {
 
-    private final AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -24,7 +25,7 @@ public class XmlUniqueMerchantsTasklet implements Tasklet {
             stream.alias("UniqueMerchants", UniqueMerchants.class);
             FileWriter fileWriter = new FileWriter("src/main/ProcessedOutFiles/XmlTotalUniqueMerchants.xml");
             StringBuilder fileBuilder = new StringBuilder();
-            fileBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            fileBuilder.append(XmlFile.HEADER.toString());
 
             fileBuilder.append(stream.toXML(analysisMap.getReportMap().get("unique-merchants")));
 

@@ -1,7 +1,8 @@
 package com.smoothstack.alinefinancial.tasklets;
 
-import com.smoothstack.alinefinancial.analysismodels.InsufficientBalance;
-import com.smoothstack.alinefinancial.analysismodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.xmlmodels.InsufficientBalance;
+import com.smoothstack.alinefinancial.xmlmodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.maps.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
@@ -23,7 +24,7 @@ public class AnalysisTasklet implements Tasklet {
     private MerchantMap merchantMap = MerchantMap.getInstance();
     private StateMap stateMap = StateMap.getInstance();
     private UserMap userMap = UserMap.getInstance();
-    private AnalysisMap analysis = AnalysisMap.getInstance();
+    private AnalysisMap analysis = AnalysisMap.getAnalysisMap();
 
     private InsufficientBalance balances = new InsufficientBalance();
 
@@ -104,10 +105,10 @@ public class AnalysisTasklet implements Tasklet {
                     .limit(5)
                     .collect(Collectors.toList());
 
-            analysis.setStatistic("top-five-cities-total-transactions", topCitiesTotals);
+            analysis.setStatistic(StatisticStrings.TOPFIVECITIESTRANSACTIONS.toString(), topCitiesTotals);
 
             // NRVNA-93 top largest transactions
-            analysis.setStatistic("top-ten-largest-transactions", analysis.getLargestTransactions());
+            analysis.setStatistic(StatisticStrings.TOPTENLARGESTTRANSACTIONS.toString(), analysis.getLargestTransactions());
 
             // NRVNA-91 types of transactions volume
             analysis.getTypesOfTransactions().forEach((k, v) -> {

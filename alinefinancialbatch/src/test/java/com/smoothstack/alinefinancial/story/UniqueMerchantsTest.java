@@ -1,6 +1,6 @@
 package com.smoothstack.alinefinancial.story;
 
-import com.smoothstack.alinefinancial.analysismodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.xmlmodels.UniqueMerchants;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.MerchantProcessor;
@@ -35,7 +35,7 @@ public class UniqueMerchantsTest {
 
     private MerchantProcessor merchantProcessor = new MerchantProcessor();
 
-    private AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     private AnalysisTasklet analysisTasklet = new AnalysisTasklet();
 
