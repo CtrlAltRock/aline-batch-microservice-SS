@@ -1,7 +1,8 @@
 package com.smoothstack.alinefinancial.tasklets;
 
-import com.smoothstack.alinefinancial.xmlmodels.InsufficientBalance;
-import com.smoothstack.alinefinancial.xmlmodels.UniqueMerchants;
+import com.smoothstack.alinefinancial.dto.InsufficientBalance;
+import com.smoothstack.alinefinancial.dto.RecurringTransaction;
+import com.smoothstack.alinefinancial.dto.UniqueMerchants;
 import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.maps.*;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +38,12 @@ public class AnalysisTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
-            // NRVNA - 87 - number of unique merchants
+
+            // NRVNA-87 - number of unique merchants
             uniqueMerchants.setTotalUniqueMerchants(Long.valueOf(merchantMap.getGeneratedMerchants().size()));
             analysis.setStatistic("unique-merchants", uniqueMerchants);
 
-            // NRVNA - 84 & 85 - number of users with insufficient balance at least once and more than once
+            // NRVNA-84 & 85 - number of users with insufficient balance at least once and more than once
 
             // capturing number of users
             Long numberOfUsers = Long.valueOf(userMap.getGeneratedUsers().size());
@@ -76,16 +78,6 @@ public class AnalysisTasklet implements Tasklet {
                 fraud.append(k.toString());
                 analysis.setStatistic(fraud.toString(), v.doubleValue() / analysis.getTransactionsByYearMap().get(k).doubleValue() * 100) ;
             });
-
-            // NRVNA-89 top 5 zipcodes with highest total money amount of transactions
-            List<Map.Entry<String, Double>> collect = analysis.getZipTransactions()
-                    .entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .limit(5)
-                    .collect(Collectors.toList());
-
-            analysis.setStatistic("top-five-zip-codes-with-highest-transaction", collect);
 
             // NRVNA-89 top 5 zipcodes with highest volume of transactions - this records just number of transactions
             List<Map.Entry<String, Long>> topZipTotals = analysis.getZipTotalTransactions()
@@ -133,6 +125,18 @@ public class AnalysisTasklet implements Tasklet {
                 transactionsGroup.append("-with-transactions");
                 analysis.setStatistic(transactionsGroup.toString(), v);
             });
+
+            // NRVNA-86 Top five recurring transactions group by merchant
+            List<Map.Entry<RecurringTransaction, Long>> recurringTransactions = analysis.getRecurringTransactions()
+                    .entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .limit(5)
+                    .collect(Collectors.toList());
+
+            analysis.setStatistic("recurring-transactions", recurringTransactions);
+
+
 
         } catch (Exception e) {
             log.error(e.toString());

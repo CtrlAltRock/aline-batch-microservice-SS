@@ -42,79 +42,87 @@ public class Steps {
     // Writer Steps
 
     @Bean
-    public Step xmlStateWriterStep() throws Exception {
+    public Step xmlStateWriterStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlStateWriterStep")
-                .tasklet(new XmlStateWriterTasklet())
+                .tasklet(new StateWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlCardWriterStep() throws Exception {
+    public Step xmlCardWriterStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlCardWriterStep")
-                .tasklet(new XmlCardWriterTasklet())
+                .tasklet(new CardWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlUserWriterStep() throws Exception {
+    public Step xmlUserWriterStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlUserWriterStep")
-                .tasklet(new XmlUserWriterTasklet())
+                .tasklet(new UserWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlMerchantWriterStep() throws Exception {
+    public Step xmlMerchantWriterStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlMerchantWriterStep")
-                .tasklet(new XmlMerchantWriterTasklet())
+                .tasklet(new MerchantWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlDepositsWriterStep() throws Exception {
+    public Step xmlDepositsWriterStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlDepositsWriterStep")
-                .tasklet(new XmlDepositsWriterTasklet())
+                .tasklet(new DepositsWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlTransOver100AndAfter8PMStep() throws Exception {
+    public Step xmlTransOver100AndAfter8PMStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlTransOver100AndAfter8PM")
-                .tasklet(new XmlTransAfter8And100())
+                .tasklet(new TransAfter8And100(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlInsufficientBalance() throws Exception {
+    public Step xmlInsufficientBalance(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlInsufficientBalance")
-                .tasklet(new XmlInsufficientBalanceUserTasklet())
+                .tasklet(new InsufficientBalanceUserTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlUniqueMerchantsStep() throws Exception {
+    public Step xmlUniqueMerchantsStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("xmlUniqueMerchantsStep")
-                .tasklet(new XmlUniqueMerchantsTasklet())
+                .tasklet(new UniqueMerchantsTasklet(filePath, fileName))
                 .build();
     }
 
-    @Bean
-    public Step xmlTopFiveRecurringMerchantTransactionsStep() throws Exception {
-        return stepsFactory.get("xmlTop5RecurringMerchantTransactionsStep")
-                .tasklet(new XmlMerchantTopFiveTransactions())
-                .build();
-    }
 
     @Bean
-    public Step xmlTopTenLargestTransactionsStep() throws Exception {
+    public Step xmlTopTenLargestTransactionsStep(String filePath, String fileName) throws Exception {
         return stepsFactory.get("XmlTopTenLargestTransactionStep")
-                .tasklet(new XmlTopTenLargestTransactionsWriterTasklet())
+                .tasklet(new TopTenLargestTransactionsWriterTasklet(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Step xmlTypesOfTransactionsStep() {
+    public Step xmlTypesOfTransactionsStep(String filePath, String fileName) {
         return stepsFactory.get("xmlTypesOfTransactionsStep")
-                .tasklet(new XmlTypesOfTransactions())
+                .tasklet(new TypesOfTransactions(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Step xmlTopFiveZipTransVolStep(String filePath, String fileName) {
+        return stepsFactory.get("xmlTopFiveZipTransVolStep")
+                .tasklet(new TopFiveZipTransVol(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Step xmlRecurringTransactionsStep(String filePath, String fileName) {
+        return stepsFactory.get("xmlRecurringTransactionsStep")
+                .tasklet(new RecurringTransactionWriterTasklet(filePath, fileName))
                 .build();
     }
 

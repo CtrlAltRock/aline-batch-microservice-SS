@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.xmlmodels;
+package com.smoothstack.alinefinancial.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,15 +12,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlRootElement(name="TypesOfTransactions")
+@XmlRootElement(name="ZipTransVol")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Slf4j(topic = "TypesOfTransactions")
-public class TypesOfTransactions {
-
-    private Long swipe = 0L;
-
-    private Long online = 0L;
-
-    private Long chip = 0L;
-
+@Slf4j(topic = "ZipTransVol")
+public class ZipTransVol {
+    private String zipcode;
+    private Long transaction_volume;
 }

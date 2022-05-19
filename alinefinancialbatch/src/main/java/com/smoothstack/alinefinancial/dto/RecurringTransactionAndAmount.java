@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.xmlmodels;
+package com.smoothstack.alinefinancial.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,11 +12,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlRootElement(name="UniqueMerchants")
+@XmlRootElement(name="RecurringTransactionAndAmount")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Slf4j(topic = "UniqueMerchants")
-public class UniqueMerchants {
-
-    private Long totalUniqueMerchants;
-
+@Slf4j(topic = "RecurringTransactionAndAmount")
+public class RecurringTransactionAndAmount {
+    private RecurringTransaction transaction;
+    private Long occurences;
 }

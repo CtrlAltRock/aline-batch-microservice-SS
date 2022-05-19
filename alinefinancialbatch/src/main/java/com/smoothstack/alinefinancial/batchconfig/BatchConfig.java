@@ -1,6 +1,7 @@
 package com.smoothstack.alinefinancial.batchconfig;
 
 import com.smoothstack.alinefinancial.enums.JobStatus;
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.flows.Flows;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.*;
@@ -133,17 +134,18 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlWriterFlow")
                 .split(taskExecutor())
-                .add(   flows.xmlCardFlow(),
-                        flows.xmlMerchantFlow(),
-                        flows.xmlStateFlow(),
-                        flows.xmlUserFlow(),
-                        flows.xmlDepositsFlow(),
-                        flows.xmlInsufficientBalanceFlow(),
-                        flows.xmlTransOver100AndAfter8PMFlow(),
-                        flows.xmlUniqueMerchantsFlow(),
-                        flows.xmlTopFiveRecurringMerchantTransactionsFlow(),
-                        flows.xmlTopTenLargestTransactionsFlow(),
-                        flows.xmlTypesOfTranasctionsFlow())
+                .add(   flows.xmlCardFlow(XmlFile.FILEPATH.toString(), XmlFile.CARDS.toString()),
+                        flows.xmlMerchantFlow(XmlFile.FILEPATH.toString(), XmlFile.MERCHANTS.toString()),
+                        flows.xmlStateFlow(XmlFile.FILEPATH.toString(), XmlFile.STATES.toString()),
+                        flows.xmlUserFlow(XmlFile.FILEPATH.toString(), XmlFile.USERS.toString()),
+                        flows.xmlDepositsFlow(XmlFile.FILEPATH.toString(),XmlFile.DEPOSITS.toString()),
+                        flows.xmlInsufficientBalanceFlow(XmlFile.FILEPATH.toString(), XmlFile.BALANCES.toString()),
+                        flows.xmlTransOver100AndAfter8PMFlow(XmlFile.FILEPATH.toString(),XmlFile.TRANSACTIONAFTER8PMOVER100.toString()),
+                        flows.xmlUniqueMerchantsFlow(XmlFile.FILEPATH.toString(), XmlFile.MERCHANTCOUNT.toString()),
+                        flows.xmlTopTenLargestTransactionsFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPTENLARGESTTRANSACTIONS.toString()),
+                        flows.xmlTypesOfTranasctionsFlow(XmlFile.FILEPATH.toString(), XmlFile.TYPESOFTRANSACTIONS.toString()),
+                        flows.xmlTopFiveZipTransVolFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPZIPTRANSVOL.toString()),
+                        flows.xmlRecurringTransactionsFlow(XmlFile.FILEPATH.toString(), XmlFile.RECURRINGTRANSACTION.toString()))
                 .build();
     }
 }

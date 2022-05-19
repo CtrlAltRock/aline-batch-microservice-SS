@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.xmlmodels;
+package com.smoothstack.alinefinancial.dto;
 
 
 import lombok.AllArgsConstructor;

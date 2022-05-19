@@ -1,11 +1,14 @@
 package com.smoothstack.alinefinancial.processors;
 
+import com.smoothstack.alinefinancial.dto.RecurringTransaction;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.maps.MerchantMap;
 import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
+
+import java.math.BigDecimal;
 
 @Slf4j(topic="MerchantProcessor")
 public class MerchantProcessor implements ItemProcessor<Transaction, Transaction> {
@@ -19,7 +22,13 @@ public class MerchantProcessor implements ItemProcessor<Transaction, Transaction
         try {
             Merchant merchant = merchantMap.findMerchantOrGenerate( item.getMerchant_name(), item.getMcc());
             // NRVNA - 86 Top five recurring transactions by merchant
-            analysisMap.addMerchantTransaction(merchant, item.getAmount());
+            RecurringTransaction recurringTransaction = new RecurringTransaction();
+            recurringTransaction.setMerchantId(item.getMerchant_name());
+            recurringTransaction.setAmount(BigDecimal.valueOf(Double.parseDouble(item.getAmount().replace("$", ""))));
+            recurringTransaction.setCardId(item.getCard());
+            recurringTransaction.setUserId(item.getUser());
+
+            analysisMap.addRecurringTransaction(recurringTransaction);
             transactionLine++;
         } catch (Exception e) {
             StringBuilder errorString = new StringBuilder();

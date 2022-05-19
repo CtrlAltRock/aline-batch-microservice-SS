@@ -1,16 +1,19 @@
 package com.smoothstack.alinefinancial.maps;
 
-import com.smoothstack.alinefinancial.xmlmodels.UserDeposit;
 import com.smoothstack.alinefinancial.comparators.SortGreatestTransactionByAmount;
+import com.smoothstack.alinefinancial.dto.RecurringTransaction;
+import com.smoothstack.alinefinancial.dto.UserDeposit;
 import com.smoothstack.alinefinancial.enums.Strings;
-import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -19,7 +22,6 @@ public class AnalysisMap {
     private final HashMap<String, Object> reportMap = new HashMap<>();
     private final HashMap<Integer, Long> fraudByYear = new HashMap<>();
     private final HashMap<Integer, Long> transactionsByYear = new HashMap<>();
-    private final HashMap<String, Double> zipTransactions = new HashMap<>();
     private final HashMap<String, Long> zipTotalTransactions = new HashMap<>();
     private final HashMap<String, Long> citiesTotalTransactions = new HashMap<>();
     private final HashMap<String, Long> typesOfTransactions = new HashMap<>();
@@ -27,7 +29,7 @@ public class AnalysisMap {
     private final HashMap<Long, UserDeposit> userDeposits = new HashMap<>();
     private final HashMap<String, HashMap<Boolean, Long> >  statesNoFraud = new HashMap<>();
     private final HashMap<String, ArrayList<Transaction> > transAfter8Above100 = new HashMap<>();
-    private final Map<Merchant, HashMap<Double, Integer> > transactionsByAmt = Collections.synchronizedMap(new HashMap<>());
+    private final HashMap<RecurringTransaction, Long> recurringTransactions = new HashMap<>();
     private final List<Transaction> largestTransactions = new ArrayList<>();
 
 
@@ -43,20 +45,20 @@ public class AnalysisMap {
         }
         return analysisMap;
     }
-    // Map getters
+
+    // HashMap getters
     public HashMap<String, Object> getReportMap() {
         return reportMap;
     }
 
-    public Map<Merchant, HashMap<Double, Integer> > getTransactionsByAmtByMerchant() {return transactionsByAmt;}
+
+    public HashMap<RecurringTransaction, Long> getRecurringTransactions() {return recurringTransactions;}
 
     public HashMap<User, Integer> getInsufficientBalanceMap() {return insufficientBalance;}
 
     public HashMap<Integer, Long> getTransactionsByYearMap() {return transactionsByYear;}
 
     public HashMap<Integer, Long> getFraudByYearMap() {return fraudByYear;}
-
-    public HashMap<String, Double> getZipTransactions() {return zipTransactions;}
 
     public HashMap<String, Long> getZipTotalTransactions() {return zipTotalTransactions;}
 
@@ -72,22 +74,13 @@ public class AnalysisMap {
 
     public List<Transaction> getLargestTransactions() {return largestTransactions;}
 
+
     // NRVNA - 86 Top five recurring transactions group by merchant
-    public synchronized void addMerchantTransaction(Merchant merchant, String amount) {
-        Double amt = Double.parseDouble(amount.replace("$", ""));
-        // haven't seen merchant before
-        if(isNull(transactionsByAmt.get(merchant))) {
-            HashMap<Double, Integer> transactionsByFreq = new HashMap<>();
-            transactionsByFreq.put(amt, 1);
-            transactionsByAmt.put(merchant, transactionsByFreq);
+    public synchronized void addRecurringTransaction(RecurringTransaction item) {
+        if(isNull(recurringTransactions.get(item))) {
+            recurringTransactions.put(item, 1L);
         } else {
-            // we've seen merchant before, but have we haven't seen this amt yet
-            if(isNull(transactionsByAmt.get(merchant).get(amt))) {
-                transactionsByAmt.get(merchant).put(amt, 1);
-            } else {
-                // we've seen this merchant before and we've seen this amt
-                transactionsByAmt.get(merchant).put(amt, transactionsByAmt.get(merchant).get(amt) + 1);
-            }
+          recurringTransactions.put(item, recurringTransactions.get(item) + 1);
         }
     }
 
@@ -112,6 +105,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 88 Percentage of fraud by year
     public synchronized void addToFraudByYear(Integer year, String fraud) {
         if (fraud.equals(Strings.YES.toString())) {
             if (isNull(fraudByYear.get(year))) {
@@ -127,6 +121,7 @@ public class AnalysisMap {
         }
     }
 
+    // divisors for percentage of fraud
     public synchronized void addToTransactionsByYear(Integer year) {
         if (isNull(transactionsByYear.get(year))) {
             transactionsByYear.put(year, 1L);
@@ -150,6 +145,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 91 Identify all types of transactions
     public synchronized void addToTypeFrequencies(String type) {
         if (isNull(typesOfTransactions.get(type))) {
             typesOfTransactions.put(type, 1L);
@@ -158,6 +154,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 90 Top 5 group by cities with total number of transactions
     public synchronized void addCityTransactionFrequencies(String city) {
         if (!city.isBlank()) {
             if (isNull(citiesTotalTransactions.get(city))) {
@@ -168,6 +165,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 89 Top 5 group by zipcodes with total amount of transactions
     public synchronized void addToZipTotals(String zip) {
         if (!zip.isBlank()) {
             if (isNull(zipTotalTransactions.get(zip))) {
@@ -178,6 +176,7 @@ public class AnalysisMap {
         }
     }
 
+    // NRVNA - 94 Total transactions group by state that had no fraud
     public synchronized void addToStatesNoFraud(String state, String fraud) {
         // first time seeing state set up boolean hashmap
         if(isNull(statesNoFraud.get(state))) {
@@ -252,5 +251,9 @@ public class AnalysisMap {
             errorMessage.append(e);
             log.error(errorMessage.toString());
         }
+    }
+
+    public static void resetAllMaps() {
+        analysisMap = new AnalysisMap();
     }
 }
