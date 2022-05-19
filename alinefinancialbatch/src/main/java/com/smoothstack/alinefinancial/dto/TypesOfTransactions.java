@@ -1,6 +1,5 @@
-package com.smoothstack.alinefinancial.analysismodels;
+package com.smoothstack.alinefinancial.dto;
 
-import com.smoothstack.alinefinancial.models.Merchant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,13 +12,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@XmlRootElement(name="MerchantTransactions")
+@XmlRootElement(name="TypesOfTransactions")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Slf4j(topic = "MerchantTransactions")
-public class MerchantTransaction {
+@Slf4j(topic = "TypesOfTransactions")
+public class TypesOfTransactions {
 
-    private Merchant merchant;
+    private Long swipe = 0L;
 
-    private String recurringTransactions;
+    private Long online = 0L;
+
+    private Long chip = 0L;
 
 }

@@ -38,67 +38,87 @@ public class Flows {
     }
 
     @Bean
-    public Flow xmlCardFlow() throws Exception {
+    public Flow xmlCardFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlCardFlow")
-                .start(steps.xmlCardWriterStep())
+                .start(steps.xmlCardWriterStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlMerchantFlow() throws Exception {
+    public Flow xmlMerchantFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlMerchantFlow")
-                .start(steps.xmlMerchantWriterStep())
+                .start(steps.xmlMerchantWriterStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlUserFlow() throws Exception {
+    public Flow xmlUserFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlUserFlow")
-                .start(steps.xmlUserWriterStep())
+                .start(steps.xmlUserWriterStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlStateFlow() throws Exception {
+    public Flow xmlStateFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlStateFlow")
-                .start(steps.xmlStateWriterStep())
+                .start(steps.xmlStateWriterStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlDepositsFlow() throws Exception {
+    public Flow xmlDepositsFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlDepositsFlow")
-                .start(steps.xmlDepositsWriterStep())
+                .start(steps.xmlDepositsWriterStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlTransOver100AndAfter8PMFlow() throws Exception {
+    public Flow xmlTransOver100AndAfter8PMFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlTransOver100AndAfter8PMFlow")
-                .start(steps.xmlTransOver100AndAfter8PMStep())
+                .start(steps.xmlTransOver100AndAfter8PMStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlInsufficientBalanceFlow() throws Exception {
+    public Flow xmlInsufficientBalanceFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlInsufficientBalanceFlow")
-                .start(steps.xmlInsufficientBalance())
+                .start(steps.xmlInsufficientBalance(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlUniqueMerchantsFlow() throws Exception {
+    public Flow xmlUniqueMerchantsFlow(String filePath, String fileName) throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlUniqueMerchantsFlow")
-                .start(steps.xmlUniqueMerchantsStep())
+                .start(steps.xmlUniqueMerchantsStep(filePath, fileName))
                 .build();
     }
 
     @Bean
-    public Flow xmlTopFiveRecurringMerchantTransactionsFlow() throws Exception {
-        return new FlowBuilder<SimpleFlow>("xmlTopFiveRecurringMerchantTransactionsFlow")
-                .start(steps.xmlTopFiveRecurringMerchantTransactionsStep())
+    public Flow xmlTopTenLargestTransactionsFlow(String filePath, String fileName) throws Exception {
+        return new FlowBuilder<SimpleFlow>("XmlTopTenLargestTransactionsFlow")
+                .start(steps.xmlTopTenLargestTransactionsStep(filePath, fileName))
                 .build();
     }
 
+    @Bean
+    public Flow xmlTypesOfTranasctionsFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlTypesOfTransactionsFlow")
+                .start(steps.xmlTypesOfTransactionsStep(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Flow xmlTopFiveZipTransVolFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlTopFiveZipTransVolFlow")
+                .start(steps.xmlTopFiveZipTransVolStep(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Flow xmlRecurringTransactionsFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlRecurringTransactionsFlow")
+                .start(steps.xmlRecurringTransactionsStep(filePath, fileName))
+                .build();
+    }
 
 }

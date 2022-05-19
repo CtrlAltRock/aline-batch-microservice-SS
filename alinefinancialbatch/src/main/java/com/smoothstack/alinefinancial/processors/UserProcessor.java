@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.processors;
 
+import com.smoothstack.alinefinancial.enums.Errors;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.maps.CardMap;
 import com.smoothstack.alinefinancial.maps.UserMap;
@@ -16,7 +17,7 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
 
     private static UserMap userMap = UserMap.getInstance();
     private CardMap cardMap = CardMap.getInstance();
-    private AnalysisMap analysisMap = AnalysisMap.getInstance();
+    private AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
     private Long transactionLine = 1L;
 
@@ -29,7 +30,7 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
             // NRVNA- 84 & 85 Insufficient Balance incrementer
             if(!item.getErrors().isBlank()) {
                 List<String> errors = Arrays.asList(item.getErrors().split(","));
-                if(errors.contains("Insufficient Balance")) {
+                if(errors.contains(Errors.INSUFFICIENT.toString())) {
                     analysisMap.addToInsufficientBalance(user);
                 }
             }

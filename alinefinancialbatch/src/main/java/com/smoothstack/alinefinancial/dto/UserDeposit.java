@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.analysismodels;
+package com.smoothstack.alinefinancial.dto;
 
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;

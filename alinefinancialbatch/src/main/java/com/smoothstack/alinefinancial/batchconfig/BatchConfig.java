@@ -1,5 +1,7 @@
 package com.smoothstack.alinefinancial.batchconfig;
 
+import com.smoothstack.alinefinancial.enums.JobStatus;
+import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.flows.Flows;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.*;
@@ -20,6 +22,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -35,13 +38,16 @@ import java.util.List;
 public class BatchConfig {
 
     @Autowired
-    StepBuilderFactory stepsFactory;
+    private StepBuilderFactory stepsFactory;
 
     @Autowired
-    JobBuilderFactory jobsFactory;
+    private JobBuilderFactory jobsFactory;
 
     @Autowired
-    Flows flows;
+    private Flows flows;
+
+    @Value("${inFile}")
+    private String filename;
 
     @Bean
     public Job theOnlyJob() throws Exception {
@@ -68,14 +74,14 @@ public class BatchConfig {
     public Flow theFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("splitFlow")
                 .start(theBigStep())
-                .from(theBigStep()).on("FAILED").to(flows.failureFlow())
-                .from(theBigStep()).on("COMPLETED").to(flows.analysisFlow())
-                .from(flows.analysisFlow()).on("FAILED").to(flows.failureFlow())
-                .from(flows.analysisFlow()).on("COMPLETED").to(xmlWriterFlow())
-                .from(xmlWriterFlow()).on("FAILED").to(flows.failureFlow())
-                .from(xmlWriterFlow()).on("COMPLETED").to(flows.reportFlow())
-                .from(flows.reportFlow()).on("FAILED").to(flows.failureFlow())
-                .from(flows.reportFlow()).on("COMPLETED").stop()
+                .from(theBigStep()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(theBigStep()).on(JobStatus.COMPLETED.toString()).to(flows.analysisFlow())
+                .from(flows.analysisFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.analysisFlow()).on(JobStatus.COMPLETED.toString()).to(xmlWriterFlow())
+                .from(xmlWriterFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(xmlWriterFlow()).on(JobStatus.COMPLETED.toString()).to(flows.reportFlow())
+                .from(flows.reportFlow()).on(JobStatus.FAILED.toString()).to(flows.failureFlow())
+                .from(flows.reportFlow()).on(JobStatus.COMPLETED.toString()).stop()
                 .build();
     }
 
@@ -100,8 +106,7 @@ public class BatchConfig {
         return new FlatFileItemReaderBuilder<Transaction>()
                 .name("csvReader")
                 .saveState(false)
-                .resource(new FileSystemResource("src/main/FilesToProcess/card_transaction.v1.csv"))
-                //.resource(new FileSystemResource("src/main/FilesToProcess/recurringMerchantTestFile.csv"))
+                .resource(new FileSystemResource(filename))
                 .linesToSkip(1)
                 .delimited()
                 .names("user", "card", "year", "month", "day", "time", "amount", "method", "merchant_name", "merchant_city", "merchant_state", "merchant_zip", "mcc", "errors", "fraud")
@@ -129,15 +134,18 @@ public class BatchConfig {
     public Flow xmlWriterFlow() throws Exception {
         return new FlowBuilder<SimpleFlow>("xmlWriterFlow")
                 .split(taskExecutor())
-                .add(flows.xmlCardFlow(),
-                        flows.xmlMerchantFlow(),
-                        flows.xmlStateFlow(),
-                        flows.xmlUserFlow(),
-                        flows.xmlDepositsFlow(),
-                        flows.xmlInsufficientBalanceFlow(),
-                        flows.xmlTransOver100AndAfter8PMFlow(),
-                        flows.xmlUniqueMerchantsFlow(),
-                        flows.xmlTopFiveRecurringMerchantTransactionsFlow())
+                .add(   flows.xmlCardFlow(XmlFile.FILEPATH.toString(), XmlFile.CARDS.toString()),
+                        flows.xmlMerchantFlow(XmlFile.FILEPATH.toString(), XmlFile.MERCHANTS.toString()),
+                        flows.xmlStateFlow(XmlFile.FILEPATH.toString(), XmlFile.STATES.toString()),
+                        flows.xmlUserFlow(XmlFile.FILEPATH.toString(), XmlFile.USERS.toString()),
+                        flows.xmlDepositsFlow(XmlFile.FILEPATH.toString(),XmlFile.DEPOSITS.toString()),
+                        flows.xmlInsufficientBalanceFlow(XmlFile.FILEPATH.toString(), XmlFile.BALANCES.toString()),
+                        flows.xmlTransOver100AndAfter8PMFlow(XmlFile.FILEPATH.toString(),XmlFile.TRANSACTIONAFTER8PMOVER100.toString()),
+                        flows.xmlUniqueMerchantsFlow(XmlFile.FILEPATH.toString(), XmlFile.MERCHANTCOUNT.toString()),
+                        flows.xmlTopTenLargestTransactionsFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPTENLARGESTTRANSACTIONS.toString()),
+                        flows.xmlTypesOfTranasctionsFlow(XmlFile.FILEPATH.toString(), XmlFile.TYPESOFTRANSACTIONS.toString()),
+                        flows.xmlTopFiveZipTransVolFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPZIPTRANSVOL.toString()),
+                        flows.xmlRecurringTransactionsFlow(XmlFile.FILEPATH.toString(), XmlFile.RECURRINGTRANSACTION.toString()))
                 .build();
     }
 }

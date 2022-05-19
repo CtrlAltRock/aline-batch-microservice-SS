@@ -1,4 +1,4 @@
-package com.smoothstack.alinefinancial.generator;
+package com.smoothstack.alinefinancial.epics;
 
 import com.smoothstack.alinefinancial.maps.CardMap;
 import com.smoothstack.alinefinancial.maps.MerchantMap;
