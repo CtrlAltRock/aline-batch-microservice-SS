@@ -60,7 +60,7 @@ public class StateMap {
             entry("WV", new State("West Virginia", "WV", "Charleston", new ArrayList<String>())),
             entry("WI", new State("Wisconsin", "WI", "Madison", new ArrayList<String>())),
             entry("WY", new State("Wyoming", "WY", "Cheyenne", new ArrayList<String>())),
-            entry("D.C.", new State("Washington D.C.", "D.C.", "Washington D.C.", new ArrayList<String>()))
+            entry("DC", new State("Washington D.C.", "DC", "Washington D.C.", new ArrayList<String>()))
 
     );
 

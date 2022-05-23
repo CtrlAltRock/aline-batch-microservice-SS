@@ -21,6 +21,7 @@ public class MerchantProcessor implements ItemProcessor<Transaction, Transaction
     public Transaction process(Transaction item) throws Exception {
         try {
             Merchant merchant = merchantMap.findMerchantOrGenerate( item.getMerchant_name(), item.getMcc());
+
             // NRVNA - 86 Top five recurring transactions by merchant
             RecurringTransaction recurringTransaction = new RecurringTransaction();
             recurringTransaction.setMerchantId(item.getMerchant_name());
@@ -29,6 +30,7 @@ public class MerchantProcessor implements ItemProcessor<Transaction, Transaction
             recurringTransaction.setUserId(item.getUser());
 
             analysisMap.addRecurringTransaction(recurringTransaction);
+
             transactionLine++;
         } catch (Exception e) {
             StringBuilder errorString = new StringBuilder();

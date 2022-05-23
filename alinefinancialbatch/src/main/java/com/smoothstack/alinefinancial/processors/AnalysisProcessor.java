@@ -1,5 +1,6 @@
 package com.smoothstack.alinefinancial.processors;
 
+import com.smoothstack.alinefinancial.enums.Strings;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +58,9 @@ public class AnalysisProcessor implements ItemProcessor<Transaction, Transaction
 
         try {
             // NRVNA-90 Top 5 group by cities with total number of transactions
-            analysisMap.addCityTransactionFrequencies(item.getMerchant_city());
-
+            if(!item.getMerchant_city().equals(Strings.ONLINE.toString())) {
+                analysisMap.addCityTransactionFrequencies(item.getMerchant_city());
+            }
         } catch (Exception e) {
             StringBuilder errorMessage = new StringBuilder();
             errorMessage.append("transactionsByCity\tException: ");

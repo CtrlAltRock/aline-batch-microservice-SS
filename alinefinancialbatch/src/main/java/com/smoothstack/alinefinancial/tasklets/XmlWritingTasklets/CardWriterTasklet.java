@@ -41,7 +41,6 @@ public class CardWriterTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
-            System.out.println(filePath);
             XStream cardXStream = new XStream();
             cardXStream.alias("Card", Card.class);
             FileWriter cardFileWriter = new FileWriter(Path.of(filePath, fileName).toString());

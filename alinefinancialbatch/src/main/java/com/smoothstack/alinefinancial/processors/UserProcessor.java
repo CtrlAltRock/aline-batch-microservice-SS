@@ -25,7 +25,6 @@ public class UserProcessor implements ItemProcessor<Transaction, Transaction> {
     public Transaction process(Transaction item) throws Exception {
         try {
             User user = userMap.findUserOrGenerate(item.getUser());
-            cardMap.findOrGenerateCard(item.getUser(), item.getCard());
 
             // NRVNA- 84 & 85 Insufficient Balance incrementer
             if(!item.getErrors().isBlank()) {

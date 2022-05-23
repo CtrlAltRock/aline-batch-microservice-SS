@@ -1,0 +1,36 @@
+User,Card,Year,Month,Day,Time,Amount,Use Chip,Merchant Name,Merchant City,Merchant State,Zip,MCC,Errors?,Is Fraud?
+0,0,2002,9,1,06:21,$134.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+0,0,2002,9,1,06:21,$134.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+0,0,2002,12,2,19:08,$71.03,Swipe Transaction,-4733023138943446282,Chicago,IL,60643.0,5812,,No
+0,0,2002,12,2,20:19,$78.32,Swipe Transaction,-2744911404133435018,Chicago,IL,60645.0,5812,,No
+0,0,2002,12,2,23:22,$127.00,Swipe Transaction,-6406662083475903219,Chicago,IL,60643.0,3390,,No
+0,0,2002,12,2,23:48,$211.00,Swipe Transaction,-7807051024009846392,Peoria,IL,61604.0,3684,,No
+0,0,2002,12,3,06:32,$18.45,Swipe Transaction,-2565173608660320061,Chicago,IL,60643.0,5912,,No
+0,0,2002,12,3,20:14,$79.78,Swipe Transaction,-4733023138943446282,Chicago,IL,60643.0,5812,,No
+1,0,2003,9,1,06:21,$50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+1,0,2004,9,1,06:21,$-544.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+1,0,2005,9,1,06:21,$-80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+1,0,2006,9,1,06:21,$70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+1,0,2007,9,1,06:21,$50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+1,0,2008,9,1,06:21,$544.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+2,0,2009,9,1,06:21,$80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+2,0,2010,9,1,06:21,$70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+2,0,2011,9,1,06:21,$-50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+0,0,2003,5,11,22:59,$430.00,Swipe Transaction,-6406662083475903219,Eagle Pass,TX,78852.0,3390,,No
+0,0,2003,5,11,23:01,$222.00,Swipe Transaction,1715299929786123066,Austin,TX,78758.0,3722,,No
+0,0,2003,5,14,13:23,$10.16,Swipe Transaction,-727612092139916043,Austin,TX,78753.0,5411,,No
+0,0,2003,5,14,20:59,$30.43,Swipe Transaction,8770419670485183201,Austin,TX,78753.0,7349,,No
+3,0,2002,9,1,06:21,$-80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+3,0,2003,9,1,06:21,$-70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+3,0,2006,9,1,06:21,$-50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+3,0,2009,9,1,06:21,$-80.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+3,0,2010,9,1,06:21,$70.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",No
+4,0,2012,9,1,06:21,$50.09,Swipe Transaction,3527213246127876953,La Verne,CA,91750.0,5300,"Insufficient Balance,",Yes
+0,0,2002,12,23,14:01,$3.62,Swipe Transaction,-6343149209980797253,Jefferson City,MO,65101.0,5921,,No
+0,0,2002,12,23,20:00,$94.02,Swipe Transaction,4581048999108455719,Jefferson City,MO,65101.0,5812,,No
+0,0,2002,12,24,09:50,$55.44,Swipe Transaction,-8408860211649002936,Jefferson City,MO,65101.0,7538,,No
+0,0,2002,12,24,17:46,$9.92,Online Transaction,6455213054093379528, ONLINE,,,5815,,No
+0,0,2002,12,24,20:29,$76.75,Swipe Transaction,4581048999108455719,Jefferson City,MO,65101.0,5812,,No
+0,0,2002,12,24,20:53,$71.64,Swipe Transaction,4751695835751691036,Jefferson City,MO,65101.0,5814,,No
+0,0,2002,12,24,21:30,$25.01,Swipe Transaction,1161578400968813655,Jefferson City,MO,65101.0,5813,,No
+0,0,2002,12,25,06:29,$139.80,Swipe Transaction,97032797689821735,Jefferson City,MO,65109.0,5411,,No

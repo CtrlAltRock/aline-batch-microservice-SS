@@ -178,40 +178,42 @@ public class AnalysisMap {
 
     // NRVNA - 94 Total transactions group by state that had no fraud
     public synchronized void addToStatesNoFraud(String state, String fraud) {
-        // first time seeing state set up boolean hashmap
-        if(isNull(statesNoFraud.get(state))) {
-            statesNoFraud.put(state, new HashMap<>());
+        if(!state.isBlank()) {
+            // first time seeing state set up boolean hashmap
+            if (isNull(statesNoFraud.get(state))) {
+                statesNoFraud.put(state, new HashMap<>());
 
-            if(fraud.equals(Strings.YES.toString())) {
-                //first time seeing fraud in state
-                if(isNull(statesNoFraud.get(state).get(true))) {
-                    statesNoFraud.get(state).put(true, 1L);
+                if (fraud.equals(Strings.YES.toString())) {
+                    //first time seeing fraud in state
+                    if (isNull(statesNoFraud.get(state).get(true))) {
+                        statesNoFraud.get(state).put(true, 1L);
+                    } else {
+                        // seen fraud in state before
+                        statesNoFraud.get(state).put(true, statesNoFraud.get(state).get(true) + 1);
+                    }
                 } else {
-                    // seen fraud in state before
-                    statesNoFraud.get(state).put(true, statesNoFraud.get(state).get(true) + 1);
+                    // first time new state has no fraud
+                    if (isNull(statesNoFraud.get(state).get(false))) {
+                        statesNoFraud.get(state).put(false, 1L);
+                    } else {
+                        // state has not had fraud before
+                        statesNoFraud.get(state).put(false, statesNoFraud.get(state).get(false) + 1);
+                    }
                 }
             } else {
-                // first time new state has no fraud
-                if(isNull(statesNoFraud.get(state).get(false))) {
-                    statesNoFraud.get(state).put(false, 1L);
-                } else {
-                    // state has not had fraud before
-                    statesNoFraud.get(state).put(false, statesNoFraud.get(state).get(false) + 1);
-                }
-            }
-        } else {
 
-            if(fraud.equals(Strings.YES.toString())) {
-                if(isNull(statesNoFraud.get(state).get(true))) {
-                    statesNoFraud.get(state).put(true, 1L);
+                if (fraud.equals(Strings.YES.toString())) {
+                    if (isNull(statesNoFraud.get(state).get(true))) {
+                        statesNoFraud.get(state).put(true, 1L);
+                    } else {
+                        statesNoFraud.get(state).put(true, statesNoFraud.get(state).get(true) + 1);
+                    }
                 } else {
-                    statesNoFraud.get(state).put(true, statesNoFraud.get(state).get(true) + 1);
-                }
-            } else {
-                if(isNull(statesNoFraud.get(state).get(false))) {
-                    statesNoFraud.get(state).put(false, 1L);
-                } else {
-                    statesNoFraud.get(state).put(false, statesNoFraud.get(state).get(false) + 1);
+                    if (isNull(statesNoFraud.get(state).get(false))) {
+                        statesNoFraud.get(state).put(false, 1L);
+                    } else {
+                        statesNoFraud.get(state).put(false, statesNoFraud.get(state).get(false) + 1);
+                    }
                 }
             }
         }

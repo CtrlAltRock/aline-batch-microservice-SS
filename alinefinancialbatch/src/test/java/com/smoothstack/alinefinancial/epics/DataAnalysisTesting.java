@@ -1,16 +1,20 @@
 package com.smoothstack.alinefinancial.epics;
 
+import com.smoothstack.alinefinancial.dto.InsufficientBalance;
 import com.smoothstack.alinefinancial.dto.RecurringTransaction;
+import com.smoothstack.alinefinancial.dto.UniqueMerchants;
+import com.smoothstack.alinefinancial.dto.UserDeposit;
+import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.enums.TransactionType;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
+import com.smoothstack.alinefinancial.maps.StateMap;
+import com.smoothstack.alinefinancial.models.State;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.AnalysisProcessor;
 import com.smoothstack.alinefinancial.processors.MerchantProcessor;
+import com.smoothstack.alinefinancial.processors.StateProcessor;
 import com.smoothstack.alinefinancial.processors.UserProcessor;
 import com.smoothstack.alinefinancial.tasklets.AnalysisTasklet;
-import com.smoothstack.alinefinancial.dto.InsufficientBalance;
-import com.smoothstack.alinefinancial.dto.UniqueMerchants;
-import com.smoothstack.alinefinancial.dto.UserDeposit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.StepExecution;
@@ -483,6 +487,121 @@ public class DataAnalysisTesting {
 
 
     }
+
+    @Test
+    public void TopFiveCitiesHighestVolTest() throws Exception {
+        AnalysisProcessor analysisProcessor = new AnalysisProcessor();
+
+        AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
+
+        AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+        // given
+        ExecutionContext ctx = new ExecutionContext();
+        ctx.put("fileName", "src/test/files/cities_volume.csv");
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
+
+        // when
+        List<Transaction> transactions = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+            List<Transaction> result = new ArrayList<>();
+            Transaction item;
+            reader.open(stepExecution.getExecutionContext());
+            while((item = reader.read()) != null) {
+                result.add(item);
+            }
+            reader.close();
+            return result;
+        });
+
+
+        // process recurring merchants
+        transactions.forEach((item) -> {
+            try {
+                analysisProcessor.process(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //StepContribution and ChunkContext can be null as the analysis does not rely on them
+        analysisTasklet.execute(null, null);
+
+        List<Map.Entry<String, Long>> topCitiesTotals = (List< Map.Entry<String, Long>>) analysisMap.getReportMap().get(StatisticStrings.TOPFIVECITIESTRANSACTIONS.toString());
+
+        assertEquals(topCitiesTotals.size(), 5);
+
+        Map.Entry<String, Long> city1 = topCitiesTotals.get(0);
+        Map.Entry<String, Long> city2 = topCitiesTotals.get(1);
+        Map.Entry<String, Long> city3 = topCitiesTotals.get(2);
+        Map.Entry<String, Long> city4 = topCitiesTotals.get(3);
+        Map.Entry<String, Long> city5 = topCitiesTotals.get(4);
+
+        assertEquals(city1.getKey(), "Monterey Park");
+        assertEquals(city1.getValue(), 20L);
+
+        assertEquals(city2.getKey(), "Mira Loma");
+        assertEquals(city2.getValue(), 16L);
+
+        assertEquals(city3.getKey(), "La Verne");
+        assertEquals(city3.getValue(), 12L);
+
+        assertEquals(city4.getKey(), "Jefferson City");
+        assertEquals(city4.getValue(), 8L);
+
+        assertEquals(city5.getKey(), "Waynesville");
+        assertEquals(city5.getValue(), 4L);
+
+    }
+
+    @Test
+    public void StatesWithNoFraudTest() throws Exception {
+        AnalysisProcessor analysisProcessor = new AnalysisProcessor();
+
+        StateProcessor stateProcessor = new StateProcessor();
+
+        StateMap stateMap = new StateMap();
+
+        AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
+
+        AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+        // given
+        ExecutionContext ctx = new ExecutionContext();
+        ctx.put("fileName", "src/test/files/states_no_fraud.csv");
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
+
+        // when
+        List<Transaction> transactions = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+            List<Transaction> result = new ArrayList<>();
+            Transaction item;
+            reader.open(stepExecution.getExecutionContext());
+            while((item = reader.read()) != null) {
+                result.add(item);
+            }
+            reader.close();
+            return result;
+        });
+
+
+        // process recurring merchants
+        transactions.forEach((item) -> {
+            try {
+                stateProcessor.process(item);
+                analysisProcessor.process(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //StepContribution and ChunkContext can be null as the analysis does not rely on them
+        analysisTasklet.execute(null, null);
+
+        List<State> statesNoFraud = (List<State>) analysisMap.getReportMap().get("states-no-fraud");
+        assertEquals(statesNoFraud.size(), 3);
+
+    }
+
+
 
     @Configuration
     @EnableBatchProcessing
