@@ -8,7 +8,6 @@ There are many tools to use when designing and developing applications for proce
 * [Transactions](#transactions)
 * [Usage](#usage)
 * [Credits](#credits)
-* [License](#license)
 
 ### Installation
 1. Clone the repository.
@@ -18,7 +17,7 @@ There are many tools to use when designing and developing applications for proce
 ### Transactions
 * Your .csv file of transactions should include a header of the records columns
   * This application is designed to use a transaction .csv with a header described below. 
-    *  User,Card,Year,Month,Day,Time,Amount,Use Chip,Merchant Name,Merchant City,Merchant State,Zip,MCC,Errors?,Is Fraud?
+    *  User, Card, Year, Month, Day, Time, Amount, Use Chip, Merchant Name, Merchant City, Merchant State, Zip, MCC, Errors?, Is Fraud?
 
 ### Usage
 - Once the new file transaction csv file has been added:
@@ -28,6 +27,16 @@ There are many tools to use when designing and developing applications for proce
 
 
 ### Credits
-
-
-### License
+ * spring-boot-starter-batch
+ * spring-boot-starter-web
+ * spring-boot-starter-data-jdbc
+ * spring-boot-starter-jdbc
+ * spring-boot-devtools
+ * spring-boot-starter-data-jpa
+ * lombok
+ * mysql-connector-java
+ * h2
+ * javafaker
+ * luhn-algorithms
+ * spring-oxm
+ * xstream
