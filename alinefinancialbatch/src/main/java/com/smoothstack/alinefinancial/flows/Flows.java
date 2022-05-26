@@ -121,4 +121,20 @@ public class Flows {
                 .build();
     }
 
+    @Bean
+    public Flow xmlTopFiveCitiesTransVolFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlTopFiveCitiesTransVolFlow")
+                .start(steps.xmlTopFiveCitiesTransVolStep(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Flow xmlStatesNoFraudFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlStatesNoFraudFlow")
+                .start(steps.xmlStatesNoFraudStep(filePath, fileName))
+                .build();
+    }
+
+
+
 }

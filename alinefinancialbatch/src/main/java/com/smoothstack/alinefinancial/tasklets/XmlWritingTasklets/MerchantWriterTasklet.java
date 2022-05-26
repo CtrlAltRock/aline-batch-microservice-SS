@@ -21,7 +21,7 @@ public class MerchantWriterTasklet implements Tasklet {
     private String filePath = XmlFile.FILEPATH.toString();
 
     // default fileName
-    private String fileName = "Cards.xml";
+    private String fileName = XmlFile.MERCHANTS.toString();
 
     private final MerchantMap merchantMap = MerchantMap.getInstance();
 
@@ -44,7 +44,6 @@ public class MerchantWriterTasklet implements Tasklet {
         try {
             XStream merchantXStream = new XStream();
             merchantXStream.alias("Merchant", Merchant.class);
-            merchantXStream.omitField(Merchant.class, "transactionsByAmt");
             FileWriter merchantFileWriter = new FileWriter(Path.of(filePath, fileName).toString());
             StringBuilder merchantStringBuilder = new StringBuilder();
             merchantStringBuilder.append(XmlFile.HEADER.toString());
@@ -53,6 +52,7 @@ public class MerchantWriterTasklet implements Tasklet {
             merchantMap.getGeneratedMerchants().forEach((k, v) -> {
                 merchantStringBuilder.append(merchantXStream.toXML(v));
             });
+
             merchantStringBuilder.append("\n</Merchants>");
             merchantFileWriter.append(merchantStringBuilder);
             merchantFileWriter.close();

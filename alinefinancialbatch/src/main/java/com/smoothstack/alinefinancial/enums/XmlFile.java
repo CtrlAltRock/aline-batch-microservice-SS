@@ -15,7 +15,9 @@ public enum XmlFile {
     RECURRINGTRANSACTION("RecurringTransactions.xml"),
     TRANSACTIONAFTER8PMOVER100("TransactionsOver100And8PM.xml"),
     TYPESOFTRANSACTIONS("TypesOfTransactions.xml"),
-    TOPTENLARGESTTRANSACTIONS("TopTenLargestTransactions.xml")
+    TOPTENLARGESTTRANSACTIONS("TopTenLargestTransactions.xml"),
+    TOPFIVECITIESHIGHESTVOLUME("TopFiveHighestVolume.xml"),
+    STATESNOFRAUD("StatesNoFraud.xml")
     ;
 
     private final String text;

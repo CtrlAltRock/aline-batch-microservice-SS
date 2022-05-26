@@ -126,4 +126,18 @@ public class Steps {
                 .build();
     }
 
+    @Bean
+    public Step xmlTopFiveCitiesTransVolStep(String filePath, String fileName) {
+        return stepsFactory.get("xmlTopFiveCitiesTransVolStep")
+                .tasklet(new CityAndTransactionVolWriterTasklet(filePath, fileName))
+                .build();
+    }
+
+    @Bean
+    public Step xmlStatesNoFraudStep(String filePath, String fileName) {
+        return stepsFactory.get("xmlStatesNoFraudStep")
+                .tasklet(new StatesNoFraudWriterTasklet(filePath, fileName))
+                .build();
+    }
+
 }

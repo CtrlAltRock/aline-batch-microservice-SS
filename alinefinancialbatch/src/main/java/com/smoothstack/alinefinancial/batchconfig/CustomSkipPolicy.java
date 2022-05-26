@@ -15,10 +15,12 @@ public class CustomSkipPolicy implements SkipPolicy {
     public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
         if (t instanceof Throwable){
             skipCount++;
+            skipMessage.append("thrown: ");
+            skipMessage.append(t);
+            skipMessage.append("\t");
             skipMessage.append("skipCount: ");
             skipMessage.append(skipCount);
             skipMessage.append("\n");
-            log.error(t.toString());
             log.error(skipMessage.toString());
             return true;
         }

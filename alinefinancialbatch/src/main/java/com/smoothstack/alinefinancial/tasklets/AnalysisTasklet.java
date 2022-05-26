@@ -5,12 +5,14 @@ import com.smoothstack.alinefinancial.dto.RecurringTransaction;
 import com.smoothstack.alinefinancial.dto.UniqueMerchants;
 import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.maps.*;
+import com.smoothstack.alinefinancial.models.State;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -108,14 +110,15 @@ public class AnalysisTasklet implements Tasklet {
             });
 
             // NRVNA-94 states with no fraud
+            List<State> statesNoFraud = new ArrayList<>();
+
             analysis.getStatesNoFraud().forEach((k, v) -> {
                 if(v.get(true) == null) {
-                    StringBuilder noFraud = new StringBuilder();
-                    noFraud.append("no-fraud-");
-                    noFraud.append(k);
-                    analysis.setStatistic(noFraud.toString(), "no-fraud");
+                    statesNoFraud.add(stateMap.getSeenStates().get(k));
                 }
             });
+
+            analysis.setStatistic("states-no-fraud", statesNoFraud);
 
             // NRVNA-92 group transactions by zip and online over $100 and after 8PM
             analysis.getTransAfter8Above100().forEach((k, v) -> {
