@@ -1,7 +1,6 @@
 package com.smoothstack.alinefinancial.tasklets.XmlWritingTasklets;
 
-
-import com.smoothstack.alinefinancial.dto.InsufficientBalance;
+import com.smoothstack.alinefinancial.dto.MonthOnlineCount;
 import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.thoughtworks.xstream.XStream;
@@ -14,19 +13,23 @@ import org.springframework.batch.repeat.RepeatStatus;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
-@Slf4j(topic = "XmlInsufficientBalanceUserTasklet")
-public class InsufficientBalanceUserTasklet implements Tasklet {
+import static java.util.Objects.isNull;
+
+@Slf4j(topic = "LowestMonthOnlineTransactionCount")
+public class LowestMonthOnlineTransactionCount implements Tasklet {
 
     // default filePath
     private String filePath = XmlFile.FILEPATH.toString();
 
     // default fileName
-    private String fileName = XmlFile.BALANCES.toString();
+    private String fileName = XmlFile.MONTHONLINECOUNT.toString();
 
     private final AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
 
-    public InsufficientBalanceUserTasklet(String filePath, String fileName) {
+    public LowestMonthOnlineTransactionCount(String filePath, String fileName) {
         try {
             if(new File(filePath).isDirectory()) {
                 this.filePath = filePath;
@@ -41,22 +44,27 @@ public class InsufficientBalanceUserTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-
         try {
-            XStream stream = new XStream();
-            stream.alias("InsufficientBalance", InsufficientBalance.class);
-            FileWriter insufficientBalanceFile = new FileWriter(Path.of(filePath, fileName).toString());
-            StringBuilder fileBuilder = new StringBuilder();
-            fileBuilder.append(XmlFile.HEADER.toString());
-            fileBuilder.append(stream.toXML(analysisMap.getReportMap().get("insufficient-balance")));
-            insufficientBalanceFile.append(fileBuilder);
-            insufficientBalanceFile.close();
+            List<Map.Entry<Integer, Long>> lowestMonthsOfOnlineTransactions = (List<Map.Entry<Integer, Long>>) analysisMap.getReportMap().get("bottom-five-months-online-transactions");
+            if(!isNull(lowestMonthsOfOnlineTransactions)) {
+                XStream stream = new XStream();
+                stream.alias("MonthOnlineCount", MonthOnlineCount.class);
+                FileWriter writer = new FileWriter(Path.of(filePath, fileName).toString());
+                StringBuilder fileBuilder = new StringBuilder();
+                fileBuilder.append(XmlFile.HEADER.toString());
+
+                lowestMonthsOfOnlineTransactions.stream().forEach( x -> {
+                    fileBuilder.append(stream.toXML(new MonthOnlineCount(x.getKey(), x.getValue())));
+                    fileBuilder.append("\n");
+                });
+
+                writer.append(fileBuilder);
+                writer.close();
+            }
 
         } catch (Exception e) {
             log.error(e.toString());
         }
-
         return null;
-
     }
 }

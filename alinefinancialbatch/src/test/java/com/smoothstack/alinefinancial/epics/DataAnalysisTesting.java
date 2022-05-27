@@ -202,22 +202,10 @@ public class DataAnalysisTesting {
             }
         });
 
-        Transaction t1 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$1544.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t2 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t3 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t4 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$134.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "Yes");
-        Transaction t5 = new Transaction(3l, 0l, 2002, 9, 1, "06:21", "$121.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t6 = new Transaction(0l, 0l, 2002, 9, 1, "06:21", "$80.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t7 = new Transaction(2l, 0l, 2002, 9, 1, "06:21", "$80.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t8 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t9 = new Transaction(1l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-        Transaction t10 = new Transaction(2l, 0l, 2002, 9, 1, "06:21", "$70.09", "Swipe Transaction", "3527213246127876953", "La Verne", "CA", "91750.0", "5300", "Insufficient Balance,", "No");
-
-
-        List<Transaction> testLargestTransactions = Arrays.asList(t1, t2, t3, t4, t5,
-                t6, t7, t8, t9, t10);
 
         assertEquals(analysisMap.getLargestTransactions().size(), 10);
+
+
 
     }
 
@@ -598,6 +586,71 @@ public class DataAnalysisTesting {
 
         List<State> statesNoFraud = (List<State>) analysisMap.getReportMap().get("states-no-fraud");
         assertEquals(statesNoFraud.size(), 3);
+
+    }
+
+    @Test
+    public void bottomFiveMonthsTest() throws Exception {
+        AnalysisProcessor analysisProcessor = new AnalysisProcessor();
+
+        AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
+
+        AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+        // given
+        ExecutionContext ctx = new ExecutionContext();
+        ctx.put("fileName", "src/main/FilesToProcess/test2.csv");
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
+
+        // when
+        List<Transaction> transactions = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+            List<Transaction> result = new ArrayList<>();
+            Transaction item;
+            reader.open(stepExecution.getExecutionContext());
+            while((item = reader.read()) != null) {
+                result.add(item);
+            }
+            reader.close();
+            return result;
+        });
+
+
+        transactions.forEach((item) -> {
+            try {
+                analysisProcessor.process(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //StepContribution and ChunkContext can be null as the analysis does not rely on them
+        analysisTasklet.execute(null, null);
+
+        /*
+        * after using pandas to load test2.csv into dataframe
+        * ran this expression to get a subset where all merchant cities were online and count all month values
+        * test2[(test2["Month"]> 0) & (test2["Merchant City"] == " ONLINE")]["Month"].value_counts()
+        * */
+
+        List<Map.Entry<Integer, Long>> lowestMonthsOfOnlineTransactions  =  (List<Map.Entry<Integer, Long>>) analysisMap.getReportMap().get("bottom-five-months-online-transactions");
+
+        assertEquals(lowestMonthsOfOnlineTransactions.size(), 5);
+
+        assertEquals(lowestMonthsOfOnlineTransactions.get(0).getKey(), 2);
+        assertEquals(lowestMonthsOfOnlineTransactions.get(0).getValue(), 1731);
+
+        assertEquals(lowestMonthsOfOnlineTransactions.get(1).getKey(), 4);
+        assertEquals(lowestMonthsOfOnlineTransactions.get(1).getValue(), 1734);
+
+        assertEquals(lowestMonthsOfOnlineTransactions.get(2).getKey(), 7);
+        assertEquals(lowestMonthsOfOnlineTransactions.get(2).getValue(), 1760);
+
+        assertEquals(lowestMonthsOfOnlineTransactions.get(3).getKey(), 3);
+        assertEquals(lowestMonthsOfOnlineTransactions.get(3).getValue(), 1771);
+
+        assertEquals(lowestMonthsOfOnlineTransactions.get(4).getKey(), 12);
+        assertEquals(lowestMonthsOfOnlineTransactions.get(4).getValue(), 1785);
+
 
     }
 

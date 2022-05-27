@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.util.Objects.isNull;
 
@@ -30,6 +32,8 @@ public class AnalysisMap {
     private final HashMap<String, HashMap<Boolean, Long> >  statesNoFraud = new HashMap<>();
     private final HashMap<String, ArrayList<Transaction> > transAfter8Above100 = new HashMap<>();
     private final HashMap<RecurringTransaction, Long> recurringTransactions = new HashMap<>();
+    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<String> > cityMerchantsOnline = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Long> monthsOnlineTransactionsCount = new ConcurrentHashMap<>();
     private final List<Transaction> largestTransactions = new ArrayList<>();
 
 
@@ -73,6 +77,10 @@ public class AnalysisMap {
     public HashMap<Long, UserDeposit> getUserDeposit() {return userDeposits;}
 
     public List<Transaction> getLargestTransactions() {return largestTransactions;}
+
+    public ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> getCityMerchantsOnline() {return cityMerchantsOnline;}
+
+    public ConcurrentHashMap<Integer, Long> getMonthsOnlineTransactionsCount() {return monthsOnlineTransactionsCount;}
 
 
     // NRVNA - 86 Top five recurring transactions group by merchant
@@ -130,7 +138,7 @@ public class AnalysisMap {
         }
     }
 
-    // NRVNA - 88 Top 10 largest transactions
+    // NRVNA - 93 Top 10 largest transactions
     public synchronized void addToLargestTransactions(Transaction item) {
         if(largestTransactions.size() < 10) {
             largestTransactions.add(item);
@@ -242,6 +250,26 @@ public class AnalysisMap {
             }
         }
 
+    }
+
+    public void addToCitiesWithMerchantsOnline(String city, String merchantId) {
+        if(isNull(cityMerchantsOnline.get(city))) {
+            ConcurrentLinkedQueue<String> merchantList = new ConcurrentLinkedQueue<>();
+            merchantList.add(merchantId);
+            cityMerchantsOnline.put(city, merchantList);
+        } else {
+            if(!cityMerchantsOnline.get(city).contains(merchantId)) {
+                cityMerchantsOnline.get(city).add(merchantId);
+            }
+        }
+    }
+
+    public synchronized void addToMonthsOnlineTransactionCount(Integer month) {
+        if(isNull(monthsOnlineTransactionsCount.get(month))) {
+            monthsOnlineTransactionsCount.put(month, 1L);
+        } else {
+            monthsOnlineTransactionsCount.put(month, monthsOnlineTransactionsCount.get(month) + 1);
+        }
     }
 
     public void setStatistic(String statName, Object stat) {

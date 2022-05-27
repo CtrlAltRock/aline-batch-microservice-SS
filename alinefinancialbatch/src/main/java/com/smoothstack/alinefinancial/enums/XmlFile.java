@@ -17,7 +17,8 @@ public enum XmlFile {
     TYPESOFTRANSACTIONS("TypesOfTransactions.xml"),
     TOPTENLARGESTTRANSACTIONS("TopTenLargestTransactions.xml"),
     TOPFIVECITIESHIGHESTVOLUME("TopFiveHighestVolume.xml"),
-    STATESNOFRAUD("StatesNoFraud.xml")
+    STATESNOFRAUD("StatesNoFraud.xml"),
+    MONTHONLINECOUNT("LowestMonthOnlineTransactionCount.xml")
     ;
 
     private final String text;

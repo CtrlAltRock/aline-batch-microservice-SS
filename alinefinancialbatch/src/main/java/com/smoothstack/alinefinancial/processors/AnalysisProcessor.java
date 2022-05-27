@@ -13,6 +13,7 @@ public class AnalysisProcessor implements ItemProcessor<Transaction, Transaction
 
     private Long transactionLine = 1L;
 
+    @io.micrometer.core.annotation.Counted
     @Override
     public Transaction process(Transaction item) throws Exception {
 
@@ -120,6 +121,14 @@ public class AnalysisProcessor implements ItemProcessor<Transaction, Transaction
             errorMessage.append(" on transaction line: ");
             errorMessage.append(transactionLine);
             log.error(errorMessage.toString());
+        }
+
+        if(item.getMerchant_city().equals(Strings.ONLINE.toString())) {
+            analysisMap.addToCitiesWithMerchantsOnline(item.getMerchant_city(), item.getMerchant_name());
+        }
+
+        if(item.getMerchant_city().equals(Strings.ONLINE.toString())) {
+            analysisMap.addToMonthsOnlineTransactionCount(item.getMonth());
         }
 
         transactionLine++;

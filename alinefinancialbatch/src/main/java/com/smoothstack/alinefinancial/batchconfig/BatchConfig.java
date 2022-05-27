@@ -147,7 +147,9 @@ public class BatchConfig {
                         flows.xmlTopFiveZipTransVolFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPZIPTRANSVOL.toString()),
                         flows.xmlRecurringTransactionsFlow(XmlFile.FILEPATH.toString(), XmlFile.RECURRINGTRANSACTION.toString()),
                         flows.xmlTopFiveCitiesTransVolFlow(XmlFile.FILEPATH.toString(), XmlFile.TOPFIVECITIESHIGHESTVOLUME.toString()),
-                        flows.xmlStatesNoFraudFlow(XmlFile.FILEPATH.toString(), XmlFile.STATESNOFRAUD.toString()))
+                        flows.xmlStatesNoFraudFlow(XmlFile.FILEPATH.toString(), XmlFile.STATESNOFRAUD.toString()),
+                        flows.xmlBottomFiveMonthOnlineCountFlow(XmlFile.FILEPATH.toString(), XmlFile.MONTHONLINECOUNT.toString())
+                )
                 .build();
     }
 }

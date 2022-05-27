@@ -135,6 +135,13 @@ public class Flows {
                 .build();
     }
 
+    @Bean
+    public Flow xmlBottomFiveMonthOnlineCountFlow(String filePath, String fileName) {
+        return new FlowBuilder<SimpleFlow>("xmlBottomFiveMonthOnlineCountFlow")
+                .start(steps.xmlBottomFiveMonthOnlineCountStep(filePath, fileName))
+                .build();
+    }
+
 
 
 }
