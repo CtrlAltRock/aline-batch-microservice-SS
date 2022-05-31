@@ -6,6 +6,7 @@ import com.smoothstack.alinefinancial.dto.UniqueMerchants;
 import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.maps.*;
 import com.smoothstack.alinefinancial.models.State;
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -36,7 +37,7 @@ public class AnalysisTasklet implements Tasklet {
     private Long atLeastOnce = 0L;
     private Long moreThanOnce = 0L;
 
-
+    @Timed("here")
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
@@ -139,7 +140,23 @@ public class AnalysisTasklet implements Tasklet {
 
             analysis.setStatistic("recurring-transactions", recurringTransactions);
 
+            /*List<Map.Entry<String, ConcurrentLinkedQueue<String>>> cityMerchantsOnline = analysis.getCityMerchantsOnline()
+                    .entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(new ConcurrentLinkedQueueSize()))
+                    .limit(10)
+                    .collect(Collectors.toList());
 
+            analysis.setStatistic("city-merchants-online-count", cityMerchantsOnline);*/
+
+            List<Map.Entry<Integer, Long>> lowestMonthsOfOnlineTransactions = analysis.getMonthsOnlineTransactionsCount()
+                    .entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+                    .limit(5)
+                    .collect(Collectors.toList());
+
+            analysis.setStatistic("bottom-five-months-online-transactions", lowestMonthsOfOnlineTransactions);
 
         } catch (Exception e) {
             log.error(e.toString());

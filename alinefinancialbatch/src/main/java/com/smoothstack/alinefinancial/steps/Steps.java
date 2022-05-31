@@ -140,4 +140,11 @@ public class Steps {
                 .build();
     }
 
+    @Bean
+    public Step xmlBottomFiveMonthOnlineCountStep(String filePath, String fileName) {
+        return stepsFactory.get("xmlBottomFiveMonthOnlineCountStep")
+                .tasklet(new LowestMonthOnlineTransactionCount(filePath, fileName))
+                .build();
+    }
+
 }
