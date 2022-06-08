@@ -15,6 +15,7 @@ public class Advice {
     @Pointcut("within(@org.springframework.stereotype.Repository *)" +
             " || within(@org.springframework.boot.autoconfigure.SpringBootApplication *)" +
             " || within(@org.springframework.context.annotation.Bean *)" +
+            " || within(@org.springframework.stereotype.Service *)" +
             " || within(@org.springframework.batch.core.configuration.annotation.EnableBatchProcessing *)"
             )
 

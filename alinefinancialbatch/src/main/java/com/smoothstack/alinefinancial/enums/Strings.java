@@ -4,6 +4,8 @@ public enum Strings {
     YES("Yes"),
     NO("No"),
     ONLINE("ONLINE"),
+    INSUFFICIENT("Insufficient Balance"),
+    COMMA(",")
     ;
 
     private final String text;

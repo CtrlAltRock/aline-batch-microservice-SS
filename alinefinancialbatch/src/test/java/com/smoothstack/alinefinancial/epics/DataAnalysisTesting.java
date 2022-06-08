@@ -8,6 +8,7 @@ import com.smoothstack.alinefinancial.enums.StatisticStrings;
 import com.smoothstack.alinefinancial.enums.TransactionType;
 import com.smoothstack.alinefinancial.maps.AnalysisMap;
 import com.smoothstack.alinefinancial.maps.StateMap;
+import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.State;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.AnalysisProcessor;
@@ -35,6 +36,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -651,6 +653,117 @@ public class DataAnalysisTesting {
         assertEquals(lowestMonthsOfOnlineTransactions.get(4).getKey(), 12);
         assertEquals(lowestMonthsOfOnlineTransactions.get(4).getValue(), 1785);
 
+
+    }
+
+    @Test
+    public void transactionsAfter8PMAndOver100() throws Exception {
+        AnalysisProcessor analysisProcessor = new AnalysisProcessor();
+
+        AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
+
+        AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+        // given
+        ExecutionContext ctx = new ExecutionContext();
+        ctx.put("fileName", "src/main/FilesToProcess/test2.csv");
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
+
+        // when
+        List<Transaction> transactions = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+            List<Transaction> result = new ArrayList<>();
+            Transaction item;
+            reader.open(stepExecution.getExecutionContext());
+            while((item = reader.read()) != null) {
+                result.add(item);
+            }
+            reader.close();
+            return result;
+        });
+
+
+        transactions.forEach((item) -> {
+            try {
+                analysisProcessor.process(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //StepContribution and ChunkContext can be null as the analysis does not rely on them
+        analysisTasklet.execute(null, null);
+
+
+        /*
+         * (test2['Time'] = pd.to_datetime(test2['Time'],format= '%H:%M' ).dt.time
+         * test2['Amount'] = test2['Amount'].str.replace('$', '')
+         * test2['Amount'] = test2['Amount'].astype(float)
+         * len(test2[(test2["Time"].between(datetime.time(20,1),datetime.time(23, 59))) & (test2["Amount"] > 100.00)])*/
+
+
+        assertEquals(analysisMap.getTransAfter8Above100().values().stream().collect(Collectors.summingInt(List::size)), 2289);
+    }
+
+
+    @Test
+    public void uniqueMerchantsWithOnlyInsufficientBalanceErrors() throws Exception {
+        MerchantProcessor merchantProcessor = new MerchantProcessor();
+
+        AnalysisMap analysisMap = AnalysisMap.getAnalysisMap();
+
+        AnalysisTasklet analysisTasklet = new AnalysisTasklet();
+
+        // given
+        ExecutionContext ctx = new ExecutionContext();
+        ctx.put("fileName", "src/main/FilesToProcess/test2.csv");
+        StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(ctx);
+
+        // when
+        List<Transaction> transactions = StepScopeTestUtils.doInStepScope(stepExecution, () -> {
+            List<Transaction> result = new ArrayList<>();
+            Transaction item;
+            reader.open(stepExecution.getExecutionContext());
+            while((item = reader.read()) != null) {
+                result.add(item);
+            }
+            reader.close();
+            return result;
+        });
+
+
+        transactions.forEach((item) -> {
+            try {
+                merchantProcessor.process(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //StepContribution and ChunkContext can be null as the analysis does not rely on them
+        analysisTasklet.execute(null, null);
+
+        /*
+         * after using pandas to load test2.csv into dataframe
+         * ran this expression to get a subset where all merchant cities were online and count all month values
+         * test2[(test2["Merchant Name"] != "") & (test2["Errors?"] == "Insufficient Balance,")]["Merchant Name"].value_counts()
+         * */
+
+        List<Map.Entry<Merchant, Long>> topFiveMerchantsBalanceErrors  =  (List<Map.Entry<Merchant, Long>>) analysisMap.getReportMap().get("top-five-merchants-most-balance-errors");
+
+        assertEquals(topFiveMerchantsBalanceErrors.get(0).getKey().getId(), "-6458444334611773637");
+        assertEquals(topFiveMerchantsBalanceErrors.get(0).getValue(), 128);
+
+        assertEquals(topFiveMerchantsBalanceErrors.get(1).getKey().getId(), "2027553650310142703");
+        assertEquals(topFiveMerchantsBalanceErrors.get(1).getValue(), 61);
+
+        assertEquals(topFiveMerchantsBalanceErrors.get(2).getKey().getId(), "5817218446178736267");
+        assertEquals(topFiveMerchantsBalanceErrors.get(2).getValue(), 61);
+
+        assertEquals(topFiveMerchantsBalanceErrors.get(3).getKey().getId(), "-1361486651208389220");
+        assertEquals(topFiveMerchantsBalanceErrors.get(3).getValue(), 56);
+
+        assertEquals(topFiveMerchantsBalanceErrors.get(4).getKey().getId(), "1913477460590765860");
+        assertEquals(topFiveMerchantsBalanceErrors.get(4).getValue(), 49);
 
     }
 

@@ -31,6 +31,9 @@ public class MerchantProcessor implements ItemProcessor<Transaction, Transaction
 
             analysisMap.addRecurringTransaction(recurringTransaction);
 
+            // NRVNA - 97 Group by Top 5 merchants with insufficient balance that had no errors
+            analysisMap.addToMerchantsWithInsufficientBalancesNoErrors(item);
+
             transactionLine++;
         } catch (Exception e) {
             StringBuilder errorString = new StringBuilder();

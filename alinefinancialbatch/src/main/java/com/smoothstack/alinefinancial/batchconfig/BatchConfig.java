@@ -3,6 +3,8 @@ package com.smoothstack.alinefinancial.batchconfig;
 import com.smoothstack.alinefinancial.enums.JobStatus;
 import com.smoothstack.alinefinancial.enums.XmlFile;
 import com.smoothstack.alinefinancial.flows.Flows;
+import com.smoothstack.alinefinancial.listeners.StepChunkListener;
+import com.smoothstack.alinefinancial.listeners.StepListener;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.processors.*;
 import com.smoothstack.alinefinancial.writers.ConsoleItemWriter;
@@ -18,6 +20,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.support.CompositeItemProcessor;
@@ -65,6 +68,7 @@ public class BatchConfig {
         taskExecutor.setCorePoolSize(12);
         taskExecutor.setMaxPoolSize(12);
         taskExecutor.afterPropertiesSet();
+
         return taskExecutor;
     }
 
@@ -96,7 +100,8 @@ public class BatchConfig {
                 .faultTolerant()
                 .skipPolicy(new CustomSkipPolicy())
                 .retryLimit(1)
-                .retry(Exception.class)
+                .retry(FlatFileParseException.class)
+                .listener(listener())
                 .taskExecutor(taskExecutor())
                 .build();
     }
@@ -114,6 +119,16 @@ public class BatchConfig {
                     setTargetType(Transaction.class);
                 }})
                 .build();
+    }
+
+    @Bean
+    public StepChunkListener listener() {
+        return new StepChunkListener();
+    }
+
+    @Bean
+    public StepListener listener2() {
+        return new StepListener();
     }
 
     @Bean

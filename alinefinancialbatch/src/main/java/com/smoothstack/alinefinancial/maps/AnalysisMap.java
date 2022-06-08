@@ -4,8 +4,11 @@ import com.smoothstack.alinefinancial.comparators.SortGreatestTransactionByAmoun
 import com.smoothstack.alinefinancial.dto.RecurringTransaction;
 import com.smoothstack.alinefinancial.dto.UserDeposit;
 import com.smoothstack.alinefinancial.enums.Strings;
+import com.smoothstack.alinefinancial.models.Merchant;
 import com.smoothstack.alinefinancial.models.Transaction;
 import com.smoothstack.alinefinancial.models.User;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
@@ -14,13 +17,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.util.Objects.isNull;
 
 @Slf4j(topic = "AnalysisMap")
 public class AnalysisMap {
+
     private final HashMap<String, Object> reportMap = new HashMap<>();
     private final HashMap<Integer, Long> fraudByYear = new HashMap<>();
     private final HashMap<Integer, Long> transactionsByYear = new HashMap<>();
@@ -32,10 +34,11 @@ public class AnalysisMap {
     private final HashMap<String, HashMap<Boolean, Long> >  statesNoFraud = new HashMap<>();
     private final HashMap<String, ArrayList<Transaction> > transAfter8Above100 = new HashMap<>();
     private final HashMap<RecurringTransaction, Long> recurringTransactions = new HashMap<>();
-    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<String> > cityMerchantsOnline = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Long> monthsOnlineTransactionsCount = new ConcurrentHashMap<>();
+    private final HashMap<Integer, Long> monthsOnlineTransactionsCount = new HashMap<>();
+    private final HashMap<Merchant, Long> merchantsWithInsufficientBalanceErrors = new HashMap<>();
     private final List<Transaction> largestTransactions = new ArrayList<>();
 
+    private final MerchantMap merchantMap = MerchantMap.getInstance();
 
     private static AnalysisMap analysisMap = null;
 
@@ -54,7 +57,6 @@ public class AnalysisMap {
     public HashMap<String, Object> getReportMap() {
         return reportMap;
     }
-
 
     public HashMap<RecurringTransaction, Long> getRecurringTransactions() {return recurringTransactions;}
 
@@ -78,22 +80,25 @@ public class AnalysisMap {
 
     public List<Transaction> getLargestTransactions() {return largestTransactions;}
 
-    public ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> getCityMerchantsOnline() {return cityMerchantsOnline;}
+    public HashMap<Integer, Long> getMonthsOnlineTransactionsCount() {return monthsOnlineTransactionsCount;}
 
-    public ConcurrentHashMap<Integer, Long> getMonthsOnlineTransactionsCount() {return monthsOnlineTransactionsCount;}
+    public HashMap<Merchant, Long> getMerchantsWithInsufficientBalanceErrors() {return merchantsWithInsufficientBalanceErrors;}
 
 
     // NRVNA - 86 Top five recurring transactions group by merchant
     public synchronized void addRecurringTransaction(RecurringTransaction item) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(isNull(recurringTransactions.get(item))) {
             recurringTransactions.put(item, 1L);
         } else {
           recurringTransactions.put(item, recurringTransactions.get(item) + 1);
         }
+        timer.stop(Timer.builder("add-recurring-transactions").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 83 deposits for users
     public synchronized void addToUserDeposits(User user, Transaction transaction) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(isNull(userDeposits.get(user.getId()))) {
             List<Transaction> deposits = new ArrayList<Transaction>();
             deposits.add(transaction);
@@ -102,19 +107,23 @@ public class AnalysisMap {
         } else {
             userDeposits.get(user.getId()).addDeposit(transaction);
         }
+        timer.stop(Timer.builder("add-to-users-deposits").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 84 & 85 Insufficient balance for users at least once and more than once
     public synchronized void addToInsufficientBalance(User user) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(isNull(insufficientBalance.get(user))) {
             insufficientBalance.put(user, 1);
         } else {
             insufficientBalance.put(user, insufficientBalance.get(user) + 1);
         }
+        timer.stop(Timer.builder("add-to-insufficient-balance").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 88 Percentage of fraud by year
     public synchronized void addToFraudByYear(Integer year, String fraud) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if (fraud.equals(Strings.YES.toString())) {
             if (isNull(fraudByYear.get(year))) {
                 fraudByYear.put(year, 1L);
@@ -127,19 +136,23 @@ public class AnalysisMap {
                 fraudByYear.put(year, 0L);
             }
         }
+        timer.stop(Timer.builder("add-to-fraud-by-year").register(Metrics.globalRegistry));
     }
 
     // divisors for percentage of fraud
     public synchronized void addToTransactionsByYear(Integer year) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if (isNull(transactionsByYear.get(year))) {
             transactionsByYear.put(year, 1L);
         } else {
             transactionsByYear.put(year, transactionsByYear.get(year) + 1);
         }
+        timer.stop(Timer.builder("add-to-transactions-by-year").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 93 Top 10 largest transactions
     public synchronized void addToLargestTransactions(Transaction item) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(largestTransactions.size() < 10) {
             largestTransactions.add(item);
             Collections.sort(largestTransactions,new SortGreatestTransactionByAmount());
@@ -151,19 +164,23 @@ public class AnalysisMap {
 
             }
         }
+        timer.stop(Timer.builder("add-to-largest-transactions").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 91 Identify all types of transactions
     public synchronized void addToTypeFrequencies(String type) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if (isNull(typesOfTransactions.get(type))) {
             typesOfTransactions.put(type, 1L);
         } else {
             typesOfTransactions.put(type, typesOfTransactions.get(type) + 1);
         }
+        timer.stop(Timer.builder("add-to-type-frequencies").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 90 Top 5 group by cities with total number of transactions
     public synchronized void addCityTransactionFrequencies(String city) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if (!city.isBlank()) {
             if (isNull(citiesTotalTransactions.get(city))) {
                 citiesTotalTransactions.put(city, 1L);
@@ -171,10 +188,12 @@ public class AnalysisMap {
                 citiesTotalTransactions.put(city, citiesTotalTransactions.get(city) + 1);
             }
         }
+        timer.stop(Timer.builder("add-city-transaction-frequencies").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 89 Top 5 group by zipcodes with total amount of transactions
     public synchronized void addToZipTotals(String zip) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if (!zip.isBlank()) {
             if (isNull(zipTotalTransactions.get(zip))) {
                 zipTotalTransactions.put(zip, 1L);
@@ -182,10 +201,12 @@ public class AnalysisMap {
                 zipTotalTransactions.put(zip, zipTotalTransactions.get(zip) + 1);
             }
         }
+        timer.stop(Timer.builder("add-to-zip-totals").register(Metrics.globalRegistry));
     }
 
     // NRVNA - 94 Total transactions group by state that had no fraud
     public synchronized void addToStatesNoFraud(String state, String fraud) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(!state.isBlank()) {
             // first time seeing state set up boolean hashmap
             if (isNull(statesNoFraud.get(state))) {
@@ -225,9 +246,11 @@ public class AnalysisMap {
                 }
             }
         }
+        timer.stop(Timer.builder("add-to-states-no-fraud").register(Metrics.globalRegistry));
     }
 
     public synchronized void addToTransOver100AndAfter8PM(Transaction item) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         Double amt = Double.parseDouble(item.getAmount().replace("$", ""));
         LocalTime time = LocalTime.parse(item.getTime(), DateTimeFormatter.ofPattern("HH:mm"));
         Integer hour = time.getHour();
@@ -249,38 +272,45 @@ public class AnalysisMap {
                 }
             }
         }
-
+        timer.stop(Timer.builder("add-to-trans-over-100-after-8pm").register(Metrics.globalRegistry));
     }
 
-    public void addToCitiesWithMerchantsOnline(String city, String merchantId) {
-        if(isNull(cityMerchantsOnline.get(city))) {
-            ConcurrentLinkedQueue<String> merchantList = new ConcurrentLinkedQueue<>();
-            merchantList.add(merchantId);
-            cityMerchantsOnline.put(city, merchantList);
-        } else {
-            if(!cityMerchantsOnline.get(city).contains(merchantId)) {
-                cityMerchantsOnline.get(city).add(merchantId);
-            }
-        }
-    }
 
+    // NRVNA - 96 Bottom 5 months with number of online transactions
     public synchronized void addToMonthsOnlineTransactionCount(Integer month) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
         if(isNull(monthsOnlineTransactionsCount.get(month))) {
             monthsOnlineTransactionsCount.put(month, 1L);
         } else {
             monthsOnlineTransactionsCount.put(month, monthsOnlineTransactionsCount.get(month) + 1);
         }
+        timer.stop(Timer.builder("add-to-months-online-transaction-count").register(Metrics.globalRegistry));
+    }
+
+    // NRVNA - 97 Group by Top 5 merchants with insufficient balance that had no errors
+    public synchronized void addToMerchantsWithInsufficientBalancesNoErrors(Transaction item) {
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
+
+        if(isNull(merchantsWithInsufficientBalanceErrors.get(item.getMerchant_name()))) {
+            if(!item.getErrors().isBlank()) {
+                if(item.getErrors().contains(Strings.INSUFFICIENT.toString()) && item.getErrors().split(Strings.COMMA.toString()).length == 1) {
+                    if(isNull(merchantsWithInsufficientBalanceErrors.get(merchantMap.getGeneratedMerchant(item.getMerchant_name())))) {
+                        merchantsWithInsufficientBalanceErrors.put(merchantMap.getGeneratedMerchant(item.getMerchant_name()), 1L);
+                    } else {
+                        merchantsWithInsufficientBalanceErrors.put(merchantMap.getGeneratedMerchant(item.getMerchant_name()),
+                                merchantsWithInsufficientBalanceErrors.get(merchantMap.getGeneratedMerchant(item.getMerchant_name())) + 1);
+                    }
+                }
+            }
+        }
+
+        timer.stop(Timer.builder("add-to-merchants-with-insufficient-balances-no-errors").register(Metrics.globalRegistry));
     }
 
     public void setStatistic(String statName, Object stat) {
-        try {
-            reportMap.put(statName, stat);
-        } catch (Exception e) {
-            StringBuilder errorMessage = new StringBuilder();
-            errorMessage.append("Method: setStatistic\tException: ");
-            errorMessage.append(e);
-            log.error(errorMessage.toString());
-        }
+        Timer.Sample timer = Timer.start(Metrics.globalRegistry);
+        reportMap.put(statName, stat);
+        timer.stop(Timer.builder("set-statistic").register(Metrics.globalRegistry));
     }
 
     public static void resetAllMaps() {
